@@ -9,7 +9,7 @@ using namespace std;
 class SQLParser {
 	public:
 		SQLParser(const string& sql);
-		~SQLParser();
+		~SQLParser() {}
 		vector <Cond> join;
 		vector <Cond> filter;
 		vector <Cond> range;

@@ -6,8 +6,9 @@
 using namespace std;
 
 const char JOIN = 1;
-const char FILT = 2;
-const char RANG = 3;
+const char IFIL = 2;
+const char SFIL = 3;
+const char RANG = 4;
 
 struct Cond {
 	char type; 

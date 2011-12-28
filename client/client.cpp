@@ -11,6 +11,8 @@
 #include "../lib/tokenize.h"
 #include "../lib/split_csv.h"
 #include "Table.h"
+#include "sqlparser.h"
+#include "cond.h"
 
 using namespace std;
 
@@ -94,6 +96,29 @@ void create(const string& table_name, const vector<string>& column_name,
 void train(const vector<string>& query, const vector<double>& weight)
 {
 	/* I am too clever; I don't need it. */
+	for (int i = 0; i < query.size(); i++) {
+		SQLParser sp(query[i]);
+		cout << "Join:";
+		for (int j = 0; j < sp.join.size(); j++) {
+			cout << sp.join[j].colA << "=" << sp.join[j].colB;
+			cout << " ";
+		}
+		cout << "\nFilter:";
+		for (int j = 0; j < sp.filter.size(); j++) {
+			cout << sp.filter[j].colName << "=";
+			if (sp.filter[j].type == IFIL)
+				cout << sp.filter[j].c_int;
+			else
+				cout << sp.filter[j].c_string;
+			cout << " ";
+		}
+		cout << "\nRange:";
+		for (int j = 0; j < sp.range.size(); j++) {
+			cout << sp.range[j].colName << sp.range[j].op << sp.range[j].c_int;
+			cout << " ";
+		}	
+		cout << "\n";
+	}
 }
 
 void load(const string& table_name, const vector<string>& row)

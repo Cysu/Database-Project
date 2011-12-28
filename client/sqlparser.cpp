@@ -15,7 +15,7 @@ SQLParser::SQLParser(const string& sql) {
 		output.push_back(token[i]);
 	}
 	for(i++; i < token.size(); i++) {
-		if (token[i] == "WHERE")
+		if (token[i] == "WHERE" || token[i] == ";")
 			break;
 	}
 
@@ -25,7 +25,7 @@ SQLParser::SQLParser(const string& sql) {
 	
 	string colx;
 	for(i++; i < token.size(); i++) {
-		if (token[i] == "," || token[i] == ";")
+		if (token[i] == ";" || token[i] == "AND")
 			continue;
 		colx = token[i++];
 		if (token[i] == "=") {
@@ -34,12 +34,14 @@ SQLParser::SQLParser(const string& sql) {
 			if (token[i][0] == '\"' ||
 			    (token[i][0] > '0' && 
 			    token[i][0] <= '9')) {
-				c.type = FILT;
 				c.colName = colx;
-				if (token[i][0] == '\"')
+				if (token[i][0] == '\"') {
+					c.type = SFIL;
 					c.c_string = token[i].substr(1, token[i].size() - 2);
-				else
+				} else {
+					c.type = IFIL;
 					sscanf(token[i].c_str(), "%d", &(c.c_int));
+				}
 				filter.push_back(c);
 			} else {
 				c.type = JOIN;
@@ -48,11 +50,11 @@ SQLParser::SQLParser(const string& sql) {
 				join.push_back(c);
 			}
 		} else if (token[i] == "<" || token[i] == ">") {
-			i++;
 			Cond c;
 			c.type = RANG;
 			c.op = token[i][0];
 			c.colName = colx;
+			i++;
 			sscanf(token[i].c_str(), "%d", &(c.c_int));
 			range.push_back(c);
 		} 
