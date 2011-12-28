@@ -1,0 +1,57 @@
+class Strings {
+  public:
+    Strings() : sid(0),size(0) {
+	    buffer = new char[513];
+		// open the database
+		//hashTree.tune_page(64000);
+		//hashTree.tune_page_cache(256000000);
+		if (!hashTree.open("data/stringTree.kct", BasicDB::ONOLOCK | BasicDB::OTRYLOCK 
+						| BasicDB::OCREATE | BasicDB::OWRITER | BasicDB::OTRUNCATE)) {
+			cerr << "open error: " << hashTree.error().name() << endl;
+		}
+		
+		//strs.tune_page(64000);
+		//strs.tune_page_cache(256000000);
+		if (!strs.open("data/stringDict.kct", BasicDB::ONOLOCK | BasicDB::OTRYLOCK 
+						| BasicDB::OCREATE | BasicDB::OWRITER | BasicDB::OTRUNCATE)) {
+			cerr << "open error: " << strs.error().name() << endl;
+		}
+    }
+    ~Strings(){
+		if (!hashTree.close()) {
+			cerr << "close error: " << hashTree.error().name() << endl;
+		}
+		if (!strs.close()) {
+			cerr << "close error: " << strs.error().name() << endl;
+		}
+    }
+    const string &get(int id) {
+    	return get1(id);
+    }
+    const char* get1(int id) {
+    	
+		if (strs.get((char*)(&id), 4, buffer, 512) == -1) {
+			return NULL;
+		}
+    	return buffer;
+    }
+    int hash(const string &str) {
+    	int ret;
+		if (hashTree.get(str.c_str(), str.length(), (char*)(&ret), 4) == -1) {
+			ret = size++;
+			hashTree.set(str.c_str(), str.length(),(const char*)(&ret), 4);
+			strs.set((const char*)(&ret), 4, str.c_str(), str.length()+1);
+		}
+		return ret;
+    }
+
+  private:
+  	char* buffer;
+  	int size;
+    int sid;
+    //map<int, string> strs;
+    TreeDB strs;
+    //map<string, int> stupid_hash;
+    TreeDB hashTree;
+};
+

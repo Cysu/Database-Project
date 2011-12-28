@@ -137,37 +137,18 @@ void execute(const string& sql)
 	int i;
 
 	result.clear();
-
-	/*if (strstr(sql.c_str(), "INSERT") != NULL ||
-		strstr(sql.c_str(), "WHERE") != NULL) {
-		fprintf(stderr, "Sorry, I give up.\n");
-		exit(1);
-	}*/
-
-	output.clear();
-	table.clear();
-	tokenize(sql.c_str(), token);
-	for (i = 0; i < token.size(); i++) {
-		if (token[i] == "SELECT" || token[i] == ",")
-			continue;
-		if (token[i] == "FROM")
-			break;
-		output.push_back(token[i]);
-	}
-	for (i++; i < token.size(); i++) {
-		if (token[i] == "," || token[i] == ";")
-			continue;
-		table.push_back(token[i]);
+	cout << sql << endl;
+	if (strstr(sql.c_str(), "INSERT") != NULL) {
+		tokenize(sql.c_str(), token);
+		i += 2;//skip INSERT INTO
+		Table& t = tables[tableId[token[i++]]];	
+		for (i++; i < token.size(); i++) {
+			if (token[i] == ";" || token[i] == ",")
+				continue;
+			t.insert(token[i].substr(1, token[i].size() - 2));	
+		}
 	}
 
-	m.clear();
-	for (i = 0; i < output.size(); i++)
-		m[output[i]] = i;
-
-	row.clear();
-	row.resize(output.size(), "");
-
-	done(table, m, 0, row);
 }
 
 int next(char *row)

@@ -67,6 +67,20 @@ void tokenize(const char *buf, vector<string>& token)
 			continue;
 		}
 
+		//insert values
+		if (buf[i] == '(') {
+			j = 0;
+			while (1) {
+				temp[j++] = buf[i++];
+				if (j > 1 && temp[j - 1] == ')')
+					break;
+			}
+			temp[j] = '\0';
+			token.push_back(temp);
+			i--;
+			continue;
+		}
+
 		fprintf(stderr, "ERROR: This code should never be executed.\n");
 		exit(1);
 	}

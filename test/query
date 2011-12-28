@@ -1,4 +1,6 @@
-2
+5
 SELECT o_date, c_data, c_first, c_last, ol_amount, i_name FROM _order, customer, order_line, item;
 SELECT i_name, i_data FROM item;
-
+INSERT INTO item VALUES (3,'abc',123,'abcde'),(4,'da',32,'123');
+INSERT INTO _order VALUES (3,12,12,'meat'),(4,13,13,'wine);
+INSERT INTO _order VALUES (5,12,11,'meat');
