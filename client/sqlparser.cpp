@@ -31,13 +31,13 @@ SQLParser::SQLParser(const string& sql) {
 		if (token[i] == "=") {
 			i++;
 			Cond c;
-			if (token[i][0] == '\"' ||
+			if (token[i][0] == '\'' ||
 			    (token[i][0] > '0' && 
 			    token[i][0] <= '9')) {
 				c.colName = colx;
-				if (token[i][0] == '\"') {
+				if (token[i][0] == '\'') {
 					c.type = SFIL;
-					c.c_string = token[i].substr(1, token[i].size() - 2);
+					c.c_string = token[i];
 				} else {
 					c.type = IFIL;
 					sscanf(token[i].c_str(), "%d", &(c.c_int));

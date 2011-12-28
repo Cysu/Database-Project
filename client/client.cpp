@@ -96,12 +96,21 @@ void create(const string& table_name, const vector<string>& column_name,
 void train(const vector<string>& query, const vector<double>& weight)
 {
 	/* I am too clever; I don't need it. */
+	pair<int, int> tmp;
 	for (int i = 0; i < query.size(); i++) {
 		SQLParser sp(query[i]);
 		cout << "Join:";
 		for (int j = 0; j < sp.join.size(); j++) {
 			cout << sp.join[j].colA << "=" << sp.join[j].colB;
 			cout << " ";
+
+			// mark to index
+			tmp = columnId[sp.join[j].colA];
+			tables[tmp.first].columns[tmp.second].needIndex = true;
+			printf("%s need\n", tables[tmp.first].columns[tmp.second].name.c_str());
+			tmp = columnId[sp.join[j].colB];
+			tables[tmp.first].columns[tmp.second].needIndex = true;
+			printf("%s need\n", tables[tmp.first].columns[tmp.second].name.c_str());
 		}
 		cout << "\nFilter:";
 		for (int j = 0; j < sp.filter.size(); j++) {
@@ -111,11 +120,19 @@ void train(const vector<string>& query, const vector<double>& weight)
 			else
 				cout << sp.filter[j].c_string;
 			cout << " ";
+
+			tmp = columnId[sp.filter[j].colName];
+			tables[tmp.first].columns[tmp.second].needIndex = true;
+			printf("%s need\n", tables[tmp.first].columns[tmp.second].name.c_str());
 		}
 		cout << "\nRange:";
 		for (int j = 0; j < sp.range.size(); j++) {
 			cout << sp.range[j].colName << sp.range[j].op << sp.range[j].c_int;
 			cout << " ";
+
+			tmp = columnId[sp.range[j].colName];
+			tables[tmp.first].columns[tmp.second].needIndex = true;
+			printf("%s need\n", tables[tmp.first].columns[tmp.second].name.c_str());
 		}	
 		cout << "\n";
 	}
@@ -139,10 +156,11 @@ void load(const string& table_name, const vector<string>& row)
 void preprocess()
 {
 	/* I am too clever; I don't need it. */
-	int i = 0;
+
+	/*int i = 0;
 	byte buf[COLUMN_MAX_LENGTH];
-	//tables[tableId[(string) "item"]].rows->get((byte*)&i, 4, buf, COLUMN_MAX_LENGTH);
-	/*for (int i = 0; i < tables[0].columns.size(); i ++) {
+	tables[tableId[(string) "item"]].rows->get((byte*)&i, 4, buf, COLUMN_MAX_LENGTH);
+	for (int i = 0; i < tables[0].columns.size(); i ++) {
 		if (tables[0].columns[i].type == INT) {
 			int v;
 			printf("%d,", *(buf + tables[0].columns[i].offset));
@@ -151,17 +169,6 @@ void preprocess()
 		}
 	}
 	printf("\n");*/
-
-	/*//get int index
-	int t = 2;
-	tables[0].columns[0].createIndex(tables[0].rows);
-	tables[0].columns[0].index->get((byte*)&t, 4, buf, COLUMN_MAX_LENGTH);
-	printf("%d\n", *buf);*/
-
-	//get string index
-	tables[0].columns[1].createIndex(tables[0].rows);
-	tables[0].columns[1].index->get("Apple", 5, buf, COLUMN_MAX_LENGTH);
-	printf("%d\n", *buf);
 }
 
 void execute(const string& sql)

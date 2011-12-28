@@ -23,8 +23,7 @@ public:
 
 private:
 	int rowLen;	// length of each row(in bytes)
-	byte* parse(const string& s);
-	
+	byte* parse(const string& s, int rowNum);
 };
 
 

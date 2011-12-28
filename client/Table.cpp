@@ -26,22 +26,23 @@ Table::Table(const string& name, const vector<string>& columnName,
 }
 
 void Table::load(const vector<string>& initRows) {
+	for (int i = 0; i < columns.size(); i ++)
+		if (columns[i].needIndex)
+			columns[i].initIndex();
+
 	for (int i = 0; i < initRows.size(); i ++) {
-		byte* row = parse(initRows[i]);
+		byte* row = parse(initRows[i], i);
 		rows->set((byte*)&i, 4, row, rowLen);
 	}
 }
 
-byte* Table::parse(const string& s) {
+byte* Table::parse(const string& s, int rowNum) {
 	byte* ret = new char[rowLen];
 	for (int i = 0, j = 0; i < columns.size(); i ++) {
 		char buf[COLUMN_MAX_LENGTH];
 		int k = 0;
-		while (s[j] != ',' && j < s.length()) {
-			if (s[j] != '\'')
-				buf[k ++] = s[j];
-			j ++;
-		}
+		while (s[j] != ',' && j < s.length()) 
+			buf[k ++] = s[j ++];
 		j ++;
 		buf[k] = '\0';
 
@@ -49,14 +50,16 @@ byte* Table::parse(const string& s) {
 			int v;
 			sscanf(buf, "%d", &v);
 			*(ret + columns[i].offset) = v;
-			//printf("%d,", *(ret + columns[i].offset));
+			// insertIndex
+			if (columns[i].needIndex)
+				columns[i].insertIndex(v, rowNum);
 		} else {
 			memcpy(ret + columns[i].offset, buf, k + 1);
-			//printf("%s,", ret + columns[i].offset);
+			// insertIndex
+			if (columns[i].needIndex)
+				columns[i].insertIndex(buf, rowNum);
 		}
-		//printf("%s", buf);
 	}
-	//printf("\n");
 	return ret;
 }
 

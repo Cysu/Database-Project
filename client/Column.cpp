@@ -11,18 +11,25 @@ Column::Column(const string& name, const string& type) {
 		this->type = STRING;
 	}
 	index = NULL;
+	needIndex = false;
 }
 
-void Column::createIndex(HashDB* rows) {
+void Column::initIndex() {
 	index = new TreeDB();
 	index->open(("data/" + name + ".kch").c_str(), TreeDB::OWRITER | TreeDB:: OCREATE);
-	DB::Cursor* cur = rows->cursor();
-	cur->jump();
-	size_t len1, len2;
-	byte* rowNum = new byte[4];
-	const byte* rowContent;
-	while ((rowNum = cur->get(&len1, &rowContent, &len2, true)) != NULL) {
-		printf("%d,%s,%d\n", *rowNum, rowContent + offset, strlen(rowContent+offset));
-		index->set((byte*)(rowContent + offset), strlen(rowContent+offset), rowNum, 4);
-	}
 }
+
+void Column::insertIndex(int key, int rowNum) {
+	const byte* kBuf = (byte*) &key;
+	const byte* vBuf = (byte*) &rowNum;
+	index->append(kBuf, 4, vBuf, 4);
+	printf("%s, %d, %d\n", name.c_str(), key, rowNum);
+}
+
+void Column::insertIndex(string key, int rowNum) {
+	const byte* kBuf = key.c_str();
+	const byte* vBuf = (byte*) &rowNum;
+	index->append(kBuf, key.length(), vBuf, 4);
+	printf("%s, %s, %d\n", name.c_str(), key.c_str(), rowNum);
+}
+
