@@ -20,6 +20,7 @@ public:
 			const vector<string>& columnType, const vector<string>& primaryKey);
 
 	void load(const vector<string>& initRows);
+	void insert(const string& row);
 
 private:
 	int rowLen;	// length of each row(in bytes)

@@ -32,8 +32,15 @@ void Table::load(const vector<string>& initRows) {
 
 	for (int i = 0; i < initRows.size(); i ++) {
 		byte* row = parse(initRows[i], i);
-		rows->set((byte*)&i, 4, row, rowLen);
+		rows->set((byte*) &i, 4, row, rowLen);
 	}
+
+	totRows = initRows.size();
+}
+
+void Table::insert(const string& row) {
+	byte* wBuf = parse(row, totRows);
+	rows->set((byte*) &totRows, 4, wBuf, rowLen);
 }
 
 byte* Table::parse(const string& s, int rowNum) {

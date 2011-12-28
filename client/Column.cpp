@@ -7,7 +7,7 @@ Column::Column(const string& name, const string& type) {
 		this->type = INT;
 	} else {
 		sscanf(type.c_str(), "VARCHAR(%d)", &len);
-		len ++;		// for '\0'
+		len += 3;		// for '\0' and '\'*2'
 		this->type = STRING;
 	}
 	index = NULL;
