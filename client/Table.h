@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include "Column.h"
 
 using namespace std;
 
@@ -17,6 +18,13 @@ public:
 
 	Table(const string& name, const vector<string>& columnName,
 			const vector<string>& columnType, const vector<string>& primaryKey);
+
+	void load(const vector<string>& initRows);
+
+private:
+	int rowLen;	// length of each row(in bytes)
+	byte* parse(const string& s);
+	
 };
 
 

@@ -6,4 +6,8 @@ enum COLUMN_TYPE {
 	STRING
 };
 
+typedef char byte;
+
+const int COLUMN_MAX_LENGTH = 256;
+
 #endif // CONST_H

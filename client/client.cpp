@@ -4,10 +4,13 @@
 #include <string>
 #include <map>
 #include <cassert>
+#include <iostream>
+#include <utility>
 
 #include "../include/client.h"
 #include "../lib/tokenize.h"
 #include "../lib/split_csv.h"
+#include "Table.h"
 
 using namespace std;
 
@@ -15,6 +18,10 @@ map<string, vector<string> > table2name;
 map<string, vector<string> > table2type;
 map<string, vector<string> > table2pkey;
 vector<string> result;
+
+vector<Table> tables;
+map<string, int> tableId;
+map<string, pair<int, int> > columnId;
 
 void done(const vector<string>& table, const map<string, int>& m,
 	int depth, vector<string>& row)
@@ -64,9 +71,24 @@ void done(const vector<string>& table, const map<string, int>& m,
 void create(const string& table_name, const vector<string>& column_name,
 	const vector<string>& column_type, const vector<string>& primary_key)
 {
-	table2name[table_name] = column_name;
+	/*table2name[table_name] = column_name;
 	table2type[table_name] = column_type;
-	table2pkey[table_name] = primary_key;
+	table2pkey[table_name] = primary_key;*/
+	Table table(table_name, column_name, column_type, primary_key);
+	tables.push_back(table);
+	tableId[table_name] = tables.size() - 1;
+	for (int i = 0; i < column_name.size(); i ++)
+		columnId[column_name[i]] = make_pair(tables.size() - 1, i);
+
+	/*cout << "table " << table.name << endl;
+	for (int i = 0; i < table.columns.size(); i ++) {
+		cout << i << ": " << table.columns[i].name << " " << table.columns[i].type << " " << table.columns[i].len << endl;
+	}
+	cout << "primary keys: ";
+	for (int i = 0; i < table.primary.size(); i ++) {
+		cout << table.primary[i] << " ";
+	}
+	cout << endl << endl;*/
 }
 
 void train(const vector<string>& query, const vector<double>& weight)
@@ -76,7 +98,7 @@ void train(const vector<string>& query, const vector<double>& weight)
 
 void load(const string& table_name, const vector<string>& row)
 {
-	FILE *fout;
+	/*FILE *fout;
 	int i;
 
 	fout = fopen(((string) "data/" + table_name).c_str(), "w");
@@ -85,12 +107,36 @@ void load(const string& table_name, const vector<string>& row)
 	for (i = 0; i < row.size(); i++)
 		fprintf(fout, "%s\n", row[i].c_str());
 
-	fclose(fout);
+	fclose(fout);*/
+	tables[tableId[table_name]].load(row);
 }
 
 void preprocess()
 {
 	/* I am too clever; I don't need it. */
+	int i = 0;
+	byte buf[COLUMN_MAX_LENGTH];
+	//tables[tableId[(string) "item"]].rows->get((byte*)&i, 4, buf, COLUMN_MAX_LENGTH);
+	/*for (int i = 0; i < tables[0].columns.size(); i ++) {
+		if (tables[0].columns[i].type == INT) {
+			int v;
+			printf("%d,", *(buf + tables[0].columns[i].offset));
+		} else {
+			printf("%s,", buf + tables[0].columns[i].offset);
+		}
+	}
+	printf("\n");*/
+
+	/*//get int index
+	int t = 2;
+	tables[0].columns[0].createIndex(tables[0].rows);
+	tables[0].columns[0].index->get((byte*)&t, 4, buf, COLUMN_MAX_LENGTH);
+	printf("%d\n", *buf);*/
+
+	//get string index
+	tables[0].columns[1].createIndex(tables[0].rows);
+	tables[0].columns[1].index->get("Apple", 5, buf, COLUMN_MAX_LENGTH);
+	printf("%d\n", *buf);
 }
 
 void execute(const string& sql)
