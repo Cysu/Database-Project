@@ -26,6 +26,7 @@ map<string, int> tableId;
 map<string, pair<int, int> > columnId;
 
 set <int> filter(Table& t, const set <Cond>& FCond); 
+void getJoinOrder(int*);
 
 void done(const vector<string>& table, const map<string, int>& m,
 	int depth, vector<string>& row)
@@ -181,6 +182,67 @@ void execute(const string& sql)
 		mttFCond[tid].insert(sp.range[i]);	
 		mttRowNum[tid] = mttRowNum[tid]/3;
 	}
+
+
+
+	cout << JConds.size() << endl;
+	int* joinOrder = new int[JConds.size()*4];
+	int* q = joinOrder;
+	int min = 2147483647;
+	int curTable;
+	for (i = 0; i < sp.tables.size(); i++)
+		if (mttRowNum[tableId[sp.tables[i]]] < min) {
+			min = mttRowNum[tableId[sp.tables[i]]];
+			curTable = tableId[sp.tables[i]];
+		}
+	set <Cond> curConds, oldConds;	
+	set <int> oldTable;
+	while (q - joinOrder < JConds.size()*4) {
+		if (JConds.empty())
+			break;
+		oldTable.insert(curTable);
+		cout << "curTable: " << curTable << endl;
+		for (set <int>::iterator it = mttcsJoin[curTable].begin(); it != mttcsJoin[curTable].end(); it++) {
+			set <Cond> t = mctCondJoin[make_pair(curTable, (*it))];
+			for (set <Cond>::iterator jt = t.begin(); jt != t.end(); jt++)
+				if (oldConds.find((*jt)) == oldConds.end())
+					curConds.insert((*jt));
+		}			
+		Cond toJoin;
+		min = 2147483647;
+		for (set <Cond>::iterator it = curConds.begin(); it != curConds.end(); it++) {
+			int tidA = columnId[it->colA].first;
+			int cidA = columnId[it->colA].second;
+			int tidB = columnId[it->colB].first;
+			int cidB = columnId[it->colB].second;
+			int max = tables[tidA].columns[cidA].index->count() > tables[tidB].columns[cidB].index->count() ?
+				tables[tidA].columns[cidA].index->count() : tables[tidB].columns[cidB].index->count();
+			if (mttRowNum[tidA] * mttRowNum[tidB] / max < min) {
+				min = mttRowNum[tidA]*mttRowNum[tidB]/max;
+				toJoin = (*it);
+				if (oldTable.find(tidA)!=oldTable.end()){
+					(*q)=tidA;
+					*(q+1)=cidA;
+					*(q+2)=tidB;
+					*(q+3)=cidB;
+					curTable = tidB;
+				} else {
+					*(q+0)=tidB;
+					*(q+1)=cidB;
+					*(q+2)=tidA;
+					*(q+3)=cidA;
+					curTable = tidA;
+				}
+			}
+		}
+		q += 4;
+		oldConds.insert(toJoin);
+		curConds.erase(toJoin);
+	}
+	cout << "Join Order: ";
+	for (i = 0; i < JConds.size() * 4; i++)
+		cout << *(joinOrder + i) << " ";
+	cout << endl;
 	/*	
 	for (map <int, set <int> >::iterator it = mttcsJoin.begin();it != mttcsJoin.end(); it++) {
 		cout << "Table:" << it->first << " need join" << endl;
@@ -195,6 +257,7 @@ void execute(const string& sql)
 			cout << "\tcol:" << (*jt) << " is selected\n";
 	}
 	*/
+	delete joinOrder;
 }
 
 
@@ -256,7 +319,7 @@ set <int> filter(Table& t, const set <Cond>& FCond) {
 	}
 	if (!found) {
 		for (int i = 0; i < t.rows->count(); i++)
-			s[1].insert(i);
+			s[p].insert(i);
 	}
 	return s[p];
 }	
