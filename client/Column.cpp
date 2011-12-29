@@ -19,8 +19,9 @@ void Column::initIndex() {
 	index->open(("data/" + name + ".kch").c_str(), TreeDB::OWRITER | TreeDB:: OCREATE);
 }
 
-void Column::insertIndex(int key, int rowNum) {
-	const byte* kBuf = (byte*) &key;
+void Column::insertIndex(unsigned int key, int rowNum) {
+	byte kBuf[4];
+	getBigNotation(key, kBuf);
 	const byte* vBuf = (byte*) &rowNum;
 	index->append(kBuf, 4, vBuf, 4);
 	//printf("%s, %d, %d\n", name.c_str(), key, rowNum);
@@ -33,16 +34,16 @@ void Column::insertIndex(string key, int rowNum) {
 	//printf("%s, %s, %d\n", name.c_str(), key.c_str(), rowNum);
 }
 
-vector<int> Column::filterBy(int key, OPR_TYPE opr) {
+vector<int> Column::filterBy(unsigned int key, OPR_TYPE opr) {
 	vector<int> ret;
 	DB::Cursor* cur = index->cursor();
 	size_t size;
 	byte* vBuf;
-	const byte* kBuf;
+	byte kBuf[4];
 	bool exist;
 	switch (opr) {
 		case EQU:
-			kBuf = (byte*) &key;
+			getBigNotation(key, kBuf);
 			exist = cur->jump(kBuf, 4);
 			if (exist) {
 				vBuf = cur->get_value(&size, false);
@@ -54,8 +55,7 @@ vector<int> Column::filterBy(int key, OPR_TYPE opr) {
 			break;
 		case LES:
 			// assert key != INT_MIN
-			key --;
-			kBuf = (byte*) &key;
+			getBigNotation(key - 1, kBuf);
 			exist = cur->jump_back(kBuf, 4);
 			while (exist) {
 				vBuf = cur->get_value(&size, false);
@@ -68,8 +68,7 @@ vector<int> Column::filterBy(int key, OPR_TYPE opr) {
 			break;
 		case GTR:
 			// assert key != INT_MAX
-			key ++;
-			kBuf = (byte*) &key;
+			getBigNotation(key + 1, kBuf);
 			exist = cur->jump(kBuf, 4);
 			while (exist) {
 				vBuf = cur->get_value(&size, false);
@@ -81,6 +80,7 @@ vector<int> Column::filterBy(int key, OPR_TYPE opr) {
 			}
 			break;
 	}
+	delete vBuf;
 	delete cur;
 	return ret;
 }

@@ -12,6 +12,6 @@ all :
 clean :
 	$(MAKE) --directory=client clean
 	$(MAKE) --directory=lib clean
-	rm -f run data/*
+	rm -f data/*
 
 

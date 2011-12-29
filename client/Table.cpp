@@ -39,6 +39,7 @@ void Table::insert(const string& row) {
 	int rowNum = rows->count();
 	byte* wBuf = parse(row, rows->count());
 	rows->set((byte*) &rowNum, 4, wBuf, rowLen);
+	delete wBuf;
 }
 
 byte* Table::parse(const string& s, int rowNum) {
@@ -52,8 +53,8 @@ byte* Table::parse(const string& s, int rowNum) {
 		buf[k] = '\0';
 
 		if (columns[i].type == INT) {
-			int v;
-			sscanf(buf, "%d", &v);
+			unsigned int v;
+			sscanf(buf, "%u", &v);
 			*(ret + columns[i].offset) = v;
 			// insertIndex
 			if (columns[i].needIndex)

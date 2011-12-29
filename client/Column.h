@@ -5,6 +5,7 @@
 #include <cstring>
 #include <kchashdb.h>
 #include "const.h"
+#include "utils.h"
 
 using namespace std;
 using namespace kyotocabinet;
@@ -21,9 +22,9 @@ public:
 	Column(const string& name, const string& type);
 	void initIndex();
 	void insertIndex(string key, int rowNum);
-	void insertIndex(int key, int rowNum);
+	void insertIndex(unsigned int key, int rowNum);
 
-	vector<int> filterBy(int key, OPR_TYPE opr);
+	vector<int> filterBy(unsigned int key, OPR_TYPE opr);
 };
 
 #endif // COLUMN_H
