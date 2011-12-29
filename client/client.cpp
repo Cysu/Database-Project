@@ -160,8 +160,8 @@ void execute(const string& sql)
 	map <int, set <Cond> >  mttCondFilter;
 	//map col to Join Cond
 	map <pair<int, int>, set <Cond> > mctCondJoin;
-	//vector of Join Cond, if it is empty the query is done
-	vector <Cond> JConds;
+	//set of Join Cond, if it is empty the query is done
+	set <Cond> JConds;
 	//map table id to the expected row# after filter
 	map <int, int> mttRowNum;
 	for (i = 0; i < tables.size(); i++) {
@@ -177,7 +177,7 @@ void execute(const string& sql)
 		cid = columnId[sp.join[i].colB].second;
 		mttcsJoin[tid].insert(cid);
 		mctCondJoin[make_pair(tid, cid)].insert(sp.join[i]);
-		JConds.push_back(sp.join[i]);
+		JConds.insert(sp.join[i]);
 		
 	}
 	for (i = 0; i < sp.range.size(); i++) {
