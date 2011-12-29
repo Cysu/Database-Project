@@ -25,6 +25,8 @@ vector<Table> tables;
 map<string, int> tableId;
 map<string, pair<int, int> > columnId;
 
+set <int> filter(Table& t, set <Cond> FCond); 
+
 void done(const vector<string>& table, const map<string, int>& m,
 	int depth, vector<string>& row)
 {
@@ -124,10 +126,12 @@ void train(const vector<string>& query, const vector<double>& weight)
 void load(const string& table_name, const vector<string>& row)
 {
 	tables[tableId[table_name]].load(row);
+	cout << "load: " << tables[0].rows->count() << endl;
 }
 
 void preprocess()
 {
+	cout << "preprocess: " << tables[0].rows->count() << endl;
 }
 
 void execute(const string& sql)
@@ -135,6 +139,8 @@ void execute(const string& sql)
 	vector<string> token, output, table, row;
 	map<string, int> m;
 	int i;
+
+	cout << "execute: " << tables[0].rows->count() << endl;
 
 	result.clear();
 	cout << sql << endl;
@@ -157,7 +163,7 @@ void execute(const string& sql)
 	//i.e. the col that need to be read from The BIG TABLE
 	map <int, set <int> > mttcsJoin, mttcsfProject;
 	//map table id to the Conds that need for filter
-	map <int, set <Cond> >  mttCondFilter;
+	map <int, set <Cond> >  mttFCond, mttRCond;
 	//map col to Join Cond
 	map <pair<int, int>, set <Cond> > mctCondJoin;
 	//set of Join Cond, if it is empty the query is done
@@ -166,6 +172,7 @@ void execute(const string& sql)
 	map <int, int> mttRowNum;
 	for (i = 0; i < tables.size(); i++) {
 		mttRowNum[i] = tables[i].rows->count();
+		cout << mttRowNum[i] << endl;
 	}	
 	for (i = 0; i < sp.join.size(); i++) {
 		int tid = columnId[sp.join[i].colA].first;
@@ -180,43 +187,31 @@ void execute(const string& sql)
 		JConds.insert(sp.join[i]);
 		
 	}
-	for (i = 0; i < sp.range.size(); i++) {
-		int tid = columnId[sp.range[i].colName].first;
-		int cid = columnId[sp.range[i].colName].second;
-		mttCondFilter[tid].insert(sp.range[i]);	
-		mttRowNum[tid] = mttRowNum[tid]/tables[tid].columns[cid].index->count();
-	}
 	for (i = 0; i < sp.filter.size(); i++) {
 		int tid = columnId[sp.filter[i].colName].first;
-		mttCondFilter[tid].insert(sp.filter[i]);	
+		int cid = columnId[sp.filter[i].colName].second;
+		mttFCond[tid].insert(sp.filter[i]);	
+		mttRowNum[tid] = mttRowNum[tid]/tables[tid].columns[cid].index->count();
+	}
+	for (i = 0; i < sp.range.size(); i++) {
+		int tid = columnId[sp.range[i].colName].first;
+		mttFCond[tid].insert(sp.range[i]);	
 		mttRowNum[tid] = mttRowNum[tid]/3;
 	}
-	/*for test
+	/*	
 	for (map <int, set <int> >::iterator it = mttcsJoin.begin();it != mttcsJoin.end(); it++) {
 		cout << "Table:" << it->first << " need join" << endl;
 		for ( set <int>::iterator jt = it->second.begin();jt != it->second.end(); jt++) {
 			cout << "\tcol" << (*jt) << endl;	
 		}
 	}	
-	for (map <int, set <Cond> >::iterator it = mttCondFilter.begin();it != mttCondFilter.end(); it++) {
-		cout << "Table:" << it->first << " need filter" << endl;
-		for (set <Cond>::iterator jt = it->second.begin(); jt != it->second.end(); jt++) {
-			cout << "\t" << jt->colName;
-			switch(jt->type) {
-				case SFIL:
-					cout << "=" << jt->c_string << endl;
-					break;
-				case IFIL:
-					cout << "=" << jt->c_int << endl;
-					break;
-				case RANG:
-					cout << jt->op << jt->c_int << endl;
-					break;
-			}
-		}
-	}
 	*/
-
+	for (map <int, set <Cond> >::iterator it = mttFCond.begin();it != mttFCond.end(); it++) {
+		cout << "Table:" << it->first << endl;
+		set <int> s = filter(tables[it->first], it->second);
+		for (set <int>::iterator jt = s.begin(); jt != s.end(); jt++)
+			cout << "\tcol:" << (*jt) << " is selected\n";
+	}
 }
 
 
@@ -241,7 +236,45 @@ void close()
 	/* I have nothing to do. */
 }
 
-vector <int> filter(Table& t, set <Cond> FCond) {
-	
-	return vector <int>();
+set <int> filter(Table& t, set <Cond> FCond) {
+	bool found = false;
+	set <int> s[2];
+	vector <int> temp;
+	int p = 0;
+	for (set <Cond>::iterator it = FCond.begin(); it != FCond.end(); it++) {
+		int tid = columnId[it->colName].first;
+		int cid = columnId[it->colName].second;	
+		temp.clear();
+		switch(it->type) {
+			case IFIL:
+				tables[tid].columns[cid].filterBy(it->c_int, EQU, temp);
+				break;
+			case SFIL:
+				tables[tid].columns[cid].filterBy(it->c_string, temp);
+				break;
+			case RANG:
+				switch(it->op) {
+					case '<':
+						tables[tid].columns[cid].filterBy(it->c_int, LES, temp);
+						break;
+					case '>':
+						tables[tid].columns[cid].filterBy(it->c_int, GTR, temp);
+						break;
+				}
+				break;
+		}	
+		s[(p+1)&1].clear();
+		for (int i = 0; i < temp.size(); i++) {
+			if (!found || s[p].find(temp[i]) != s[p].end())
+				s[(p+1)&1].insert(temp[i]);
+		}
+		found = true;
+		p = (p+1)&1;
+
+	}
+	if (!found) {
+		for (int i = 0; i < t.rows->count(); i++)
+			s[1].insert(i);
+	}
+	return s[p+1];
 }	
