@@ -13,13 +13,9 @@
 #include "Table.h"
 #include "sqlparser.h"
 #include "cond.h"
+#include "JoinAgent.h"
 
 using namespace std;
-
-map<string, vector<string> > table2name;
-map<string, vector<string> > table2type;
-map<string, vector<string> > table2pkey;
-vector<string> result;
 
 vector<Table> tables;
 map<string, int> tableId;
@@ -27,51 +23,6 @@ map<string, pair<int, int> > columnId;
 
 set <int> filter(Table& t, const set <Cond>& FCond); 
 void getJoinOrder(int*);
-
-void done(const vector<string>& table, const map<string, int>& m,
-	int depth, vector<string>& row)
-{
-	FILE *fin;
-	char buf[65536];
-	vector<string> column_name, token;
-	string str;
-	int i;
-
-	if (depth == table.size()) {
-		str = row[0];
-		for (i = 1; i < row.size(); i++)
-			str += "," + row[i];
-		result.push_back(str);
-		return;
-	}
-
-	assert(table2name.find(table[depth]) != table2name.end());
-	column_name = table2name[table[depth]];
-
-	fin = fopen(((string) "data/" + table[depth]).c_str(), "r");
-	assert(fin != NULL);
-
-	while (fgets(buf, 65536, fin) != NULL) {
-		int len = strlen(buf);
-		if (len > 0 && buf[len - 1] == '\n') {
-			buf[len - 1] = '\0';
-			len--;
-		}
-		if (len == 0)
-			continue;
-
-		split_csv(buf, token);
-		assert(token.size() == column_name.size());
-
-		for (i = 0; i < column_name.size(); i++)
-			if (m.find(column_name[i]) != m.end())
-				row[m.find(column_name[i]) -> second] = token[i];
-
-		done(table, m, depth + 1, row);
-	}
-
-	fclose(fin);
-}
 
 void create(const string& table_name, const vector<string>& column_name,
 	const vector<string>& column_type, const vector<string>& primary_key)
@@ -85,7 +36,6 @@ void create(const string& table_name, const vector<string>& column_name,
 
 void train(const vector<string>& query, const vector<double>& weight)
 {
-	/* I am too clever; I don't need it. */
 	pair<int, int> tmp;
 	for (int i = 0; i < query.size(); i++) {
 		SQLParser sp(query[i]);
@@ -156,7 +106,6 @@ void execute(const string& sql)
 	map <int, int> mttRowNum;
 	for (i = 0; i < tables.size(); i++) {
 		mttRowNum[i] = tables[i].rows->count();
-		//cout << mttRowNum[i] << endl;
 	}	
 	for (i = 0; i < sp.join.size(); i++) {
 		int tid = columnId[sp.join[i].colA].first;
@@ -183,9 +132,6 @@ void execute(const string& sql)
 		mttRowNum[tid] = mttRowNum[tid]/3;
 	}
 
-
-
-	cout << JConds.size() << endl;
 	int* joinOrder = new int[JConds.size()*4];
 	int* q = joinOrder;
 	int min = 2147483647;
@@ -201,7 +147,6 @@ void execute(const string& sql)
 		if (JConds.empty())
 			break;
 		oldTable.insert(curTable);
-		cout << "curTable: " << curTable << endl;
 		for (set <int>::iterator it = mttcsJoin[curTable].begin(); it != mttcsJoin[curTable].end(); it++) {
 			set <Cond> t = mctCondJoin[make_pair(curTable, (*it))];
 			for (set <Cond>::iterator jt = t.begin(); jt != t.end(); jt++)
@@ -239,24 +184,17 @@ void execute(const string& sql)
 		oldConds.insert(toJoin);
 		curConds.erase(toJoin);
 	}
-	cout << "Join Order: ";
-	for (i = 0; i < JConds.size() * 4; i++)
-		cout << *(joinOrder + i) << " ";
-	cout << endl;
-	/*	
-	for (map <int, set <int> >::iterator it = mttcsJoin.begin();it != mttcsJoin.end(); it++) {
-		cout << "Table:" << it->first << " need join" << endl;
-		for ( set <int>::iterator jt = it->second.begin();jt != it->second.end(); jt++) {
-			cout << "\tcol" << (*jt) << endl;	
-		}
-	}	
-	for (map <int, set <Cond> >::iterator it = mttFCond.begin();it != mttFCond.end(); it++) {
-		cout << "Table:" << it->first << endl;
-		set <int> s = filter(tables[it->first], it->second);
-		for (set <int>::iterator jt = s.begin(); jt != s.end(); jt++)
-			cout << "\tcol:" << (*jt) << " is selected\n";
+
+	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
+	set<int> f = filter(tables[joinOrder[0]], mttFCond[joinOrder[0]]);
+	ja.init(f);
+	//ja.output(ja.ret);
+	for (int i = 0; i < JConds.size(); i ++) {
+		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
+		ja.join(i, f);
 	}
-	*/
+	//ja.output(ja.ret);
+
 	delete joinOrder;
 }
 
@@ -268,10 +206,6 @@ int next(char *row)
 	strcpy(row, result.back().c_str());
 	result.pop_back();
 
-	/*
-	 * This is for debug only. You should avoid unnecessary output
-	 * when submitting, which will hurt the performance.
-	 */
 	printf("%s\n", row);
 
 	return (1);
@@ -279,7 +213,6 @@ int next(char *row)
 
 void close()
 {
-	/* I have nothing to do. */
 }
 
 set <int> filter(Table& t, const set <Cond>& FCond) {

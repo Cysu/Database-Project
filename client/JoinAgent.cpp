@@ -37,7 +37,6 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 			size_t rowLen;
 			int tmp = 0;
 			matchRows.clear();
-			rowContent = tables[0].rows->get((byte*) &tmp, 4, &rowLen);
 			rowContent = tables[tIdA].rows->get((byte*) &(ret[j][i]), 4, &rowLen);
 			int colOffset = tables[tIdA].columns[cIdA].offset;
 			int colLen = tables[tIdA].columns[cIdA].len;
@@ -50,6 +49,7 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 			}
 		}
 		addTo(newRet, j, i, matchRows, filterRet);
+		output(newRet);
 	}
 
 	for (int j = 0; j < ret.size(); j ++)

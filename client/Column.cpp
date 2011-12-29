@@ -24,14 +24,14 @@ void Column::insertIndex(unsigned int key, int rowNum) {
 	getBigNotation(key, kBuf);
 	const byte* vBuf = (byte*) &rowNum;
 	index->append(kBuf, 4, vBuf, 4);
-	printf("insertIndex: %s, %u, %d\n", name.c_str(), key, rowNum);
+	//printf("insertIndex: %s, %u, %d\n", name.c_str(), key, rowNum);
 }
 
 void Column::insertIndex(string key, int rowNum) {
 	const byte* kBuf = key.c_str();
 	const byte* vBuf = (byte*) &rowNum;
 	index->append(kBuf, key.length(), vBuf, 4);
-	printf("insertIndex: %s, %s, %d\n", name.c_str(), key.c_str(), rowNum);
+	//printf("insertIndex: %s, %s, %d\n", name.c_str(), key.c_str(), rowNum);
 }
 
 void Column::filterBy(unsigned int key, OPR_TYPE opr, vector<int>& ret) {
@@ -42,12 +42,9 @@ void Column::filterBy(unsigned int key, OPR_TYPE opr, vector<int>& ret) {
 	bool exist;
 	switch (opr) {
 		case EQU:
-			cout << "key = " << key << endl;
 			getBigNotation(key, kBuf);
-			exist = cur->jump(kBuf, 4);
-			cout << "exist = " << exist << endl;
-			if (exist) {
-				vBuf = cur->get_value(&size, false);
+			vBuf = index->get(kBuf, 4, &size);
+			if (vBuf != NULL) {
 				for (int i = 0; i < size; i += 4) {
 					int t = *((int*)(vBuf + i));
 					ret.push_back(t);

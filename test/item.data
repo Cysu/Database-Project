@@ -1,7 +1,7 @@
 5
 16,'apple',1,'too_cheap'
-3,'apple',10000,'Too_expensive'
+1,'apple',10000,'Too_expensive'
 3,'Apple',10020,'tOo_expensive'
 4,'aPple',10010,'toO_expensive'
-5,'appLe',10000,'tooexpensive'
+1,'appLe',10000,'tooexpensive'
 

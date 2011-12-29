@@ -1,6 +1,6 @@
 2
-SELECT o_date, c_data, c_first, c_last, ol_amount, i_name FROM _order, customer, order_line, item WHERE o_id = c_id AND o_id = 1 AND o_id < 12;
+SELECT i_name FROM item WHERE i_name = 'a';
 50.0
-SELECT i_name, i_data FROM item WHERE i_name = 'apple';
+SELECT i_name, i_data FROM item, _order, order_line WHERE i_id = o_id AND i_name = 'apple' AND ol_o_id = o_ol_cnt;
 50.0
 
