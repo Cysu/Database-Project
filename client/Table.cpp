@@ -29,15 +29,17 @@ void Table::load(const vector<string>& initRows) {
 		if (columns[i].needIndex)
 			columns[i].initIndex();
 
+	byte* row;
 	for (int i = 0; i < initRows.size(); i ++) {
-		byte* row = parse(initRows[i], i);
+		row = parse(initRows[i], i);
 		rows->set((byte*) &i, 4, row, rowLen);
 	}
+	delete row;
 }
 
 void Table::insert(const string& row) {
 	int rowNum = rows->count();
-	byte* wBuf = parse(row, rows->count());
+	byte* wBuf = parse(row, rowNum);
 	rows->set((byte*) &rowNum, 4, wBuf, rowLen);
 	delete wBuf;
 }

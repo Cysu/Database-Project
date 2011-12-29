@@ -24,7 +24,7 @@ void Column::insertIndex(unsigned int key, int rowNum) {
 	getBigNotation(key, kBuf);
 	const byte* vBuf = (byte*) &rowNum;
 	index->append(kBuf, 4, vBuf, 4);
-	printf("%s, %d, %d\n", name.c_str(), key, rowNum);
+	printf("insertIndex: %s, %d, %d\n", name.c_str(), key, rowNum);
 }
 
 void Column::insertIndex(string key, int rowNum) {
