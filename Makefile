@@ -14,4 +14,6 @@ clean :
 	$(MAKE) --directory=lib clean
 	rm -f data/*
 
+clear:
+	rm -f data/*
 

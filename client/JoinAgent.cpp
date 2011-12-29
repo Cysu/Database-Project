@@ -27,25 +27,34 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 	// sort
 	sort(i, 0, ret.size() - 1);
 
-	byte* rowContent;
+	vector<int*> newRet;
+
+	byte* rowContent = NULL;
 	vector<int> matchRows;
 	for (int j = 0; j < ret.size(); j ++) {
 		if (j == 0 || ret[j][i] != ret[j-1][i]) {
 			// find in index
 			size_t rowLen;
+			int tmp = 0;
+			matchRows.clear();
+			rowContent = tables[0].rows->get((byte*) &tmp, 4, &rowLen);
 			rowContent = tables[tIdA].rows->get((byte*) &(ret[j][i]), 4, &rowLen);
 			int colOffset = tables[tIdA].columns[cIdA].offset;
 			int colLen = tables[tIdA].columns[cIdA].len;
 			if (tables[tIdA].columns[cIdA].type == INT) {
-				unsigned int t = *((unsigned int*)(rowContent + colOffset));
+				unsigned int t = *(rowContent + colOffset);
 				tables[tIdB].columns[cIdB].filterBy(t, EQU, matchRows);
 			} else {
 				string t = rowContent + colOffset;
 				tables[tIdB].columns[cIdB].filterBy(t, matchRows);
 			}
 		}
-		addTo(j, i, matchRows, filterRet);
+		addTo(newRet, j, i, matchRows, filterRet);
 	}
+
+	for (int j = 0; j < ret.size(); j ++)
+		delete ret[j];
+	ret = newRet;
 }
 
 void JoinAgent::sort(int t, int l, int r) {
@@ -65,21 +74,21 @@ void JoinAgent::sort(int t, int l, int r) {
 	if (l < j) sort(t, l, j);
 }
 	
-void JoinAgent::addTo(int j, int i, const vector<int>& matchRows, const set<int>& filterRet) {
-	int k;
-	for (k = 0; k < matchRows.size(); k ++) {
-		if (filterRet.find(matchRows[k]) != filterRet.end()) {
-			ret[j][i + 1] = matchRows[k];
-			break;
-		}
-	}
-	for (k ++; k < matchRows.size(); k ++) {
+void JoinAgent::addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const set<int>& filterRet) {
+	for (int k = 0; k < matchRows.size(); k ++) {
 		if (filterRet.find(matchRows[k]) != filterRet.end()) {
 			int* joinRetItem = new int[n];
-			memcpy(joinRetItem, ret[j], n);
+			memcpy(joinRetItem, ret[j], sizeof(joinRetItem));
 			joinRetItem[i + 1] = matchRows[k];
-			ret.push_back(joinRetItem);
+			newRet.push_back(joinRetItem);
 		}
 	}
 }
 
+void JoinAgent::output(const vector<int*>& ret) {
+	printf("output:\n");
+	for (int i = 0; i < ret.size(); i ++) {
+		for (int j = 0; j < n; j ++) printf("%d ", ret[i][j]);
+		printf("\n");
+	}
+}

@@ -24,7 +24,7 @@ void Column::insertIndex(unsigned int key, int rowNum) {
 	getBigNotation(key, kBuf);
 	const byte* vBuf = (byte*) &rowNum;
 	index->append(kBuf, 4, vBuf, 4);
-	printf("insertIndex: %s, %d, %d\n", name.c_str(), key, rowNum);
+	printf("insertIndex: %s, %u, %d\n", name.c_str(), key, rowNum);
 }
 
 void Column::insertIndex(string key, int rowNum) {
@@ -37,13 +37,15 @@ void Column::insertIndex(string key, int rowNum) {
 void Column::filterBy(unsigned int key, OPR_TYPE opr, vector<int>& ret) {
 	DB::Cursor* cur = index->cursor();
 	size_t size;
-	byte* vBuf;
+	byte* vBuf = NULL;
 	byte kBuf[4];
 	bool exist;
 	switch (opr) {
 		case EQU:
+			cout << "key = " << key << endl;
 			getBigNotation(key, kBuf);
 			exist = cur->jump(kBuf, 4);
+			cout << "exist = " << exist << endl;
 			if (exist) {
 				vBuf = cur->get_value(&size, false);
 				for (int i = 0; i < size; i += 4) {

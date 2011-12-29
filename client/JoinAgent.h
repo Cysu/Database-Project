@@ -10,7 +10,6 @@
 
 using namespace std;
 
-
 class JoinAgent {
 public:
 	vector<int*> ret;
@@ -28,9 +27,11 @@ public:
 	void init(const set<int>& filterRet);
 	void join(int i, const set<int>& filterRet);
 
+	void output(const vector<int*>& ret);
+
 private:
 	void sort(int t, int l, int r);
-	void addTo(int j, int i, const vector<int>& matchRows, const set<int>& filterRet);
+	void addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const set<int>& filterRet);
 };
 
 #endif // JOINAGENT_H

@@ -29,7 +29,7 @@ void Table::load(const vector<string>& initRows) {
 		if (columns[i].needIndex)
 			columns[i].initIndex();
 
-	byte* row;
+	byte* row = NULL;
 	for (int i = 0; i < initRows.size(); i ++) {
 		row = parse(initRows[i], i);
 		rows->set((byte*) &i, 4, row, rowLen);
