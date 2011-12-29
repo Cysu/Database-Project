@@ -20,6 +20,7 @@ using namespace std;
 vector<Table> tables;
 map<string, int> tableId;
 map<string, pair<int, int> > columnId;
+vector<string> result;
 
 set <int> filter(Table& t, const set <Cond>& FCond); 
 void getJoinOrder(int*);
@@ -194,6 +195,38 @@ void execute(const string& sql)
 		ja.join(i, f);
 	}
 	//ja.output(ja.ret);
+	
+	for (i = 0; i < sp.output.size(); i++) {
+		int tid = columnId[sp.output[i]].first;
+		int cid = columnId[sp.output[i]].second;
+		int rid;
+		for (rid = 0; rid < JConds.size(); rid++)
+			if (joinOrder[rid * 4 + 2] == tid)
+				break;
+		if (tid == joinOrder[JConds.size() * 4 - 2])
+			rid = JConds.size();
+		ja.sort(rid, 0, ja.ret.size()-1);
+		for (int j = 0; j < ja.ret.size(); j++)
+			result.push_back(string());
+		byte* rowContent = NULL;
+		for (int j = 0; j < ja.ret.size(); j++) {
+			size_t rowLen;
+			rowContent = tables[tid].rows->get((byte*)&(ja.ret[j][rid]), 4, &rowLen);
+			int colOffset = tables[tid].columns[cid].offset;
+		       	int colLen = tables[tid].columns[cid].len;
+			if (tables[tid].columns[cid].type == INT) {
+				unsigned int t = *(rowContent + colOffset);
+				char buf[20];
+				sprintf(buf, "%u", t);
+				result[j] += string(buf) + ",";
+			} else {
+				string t = rowContent + colOffset;
+				result[j] += t + ",";
+			}
+		}
+			
+
+	}
 
 	delete joinOrder;
 }

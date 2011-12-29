@@ -29,8 +29,8 @@ public:
 
 	void output(const vector<int*>& ret);
 
-private:
 	void sort(int t, int l, int r);
+private:
 	void addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const set<int>& filterRet);
 };
 
