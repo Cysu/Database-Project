@@ -128,10 +128,6 @@ void load(const string& table_name, const vector<string>& row)
 
 void preprocess()
 {
-	vector<int> ret = tables[0].columns[0].filterBy(5, GTR);
-	for (int i = 0; i < ret.size(); i ++)
-		cout << ret[i] << " ";
-	cout << endl;
 }
 
 void execute(const string& sql)
@@ -151,9 +147,78 @@ void execute(const string& sql)
 				continue;
 			t.insert(token[i].substr(1, token[i].size() - 2));	
 		}
+		return;	
 	}
 
+	//SELECT
+	SQLParser sp(sql);
+
+	//maps table id to the col ids that used for join or project
+	//i.e. the col that need to be read from The BIG TABLE
+	map <int, set <int> > mttcsJoin, mttcsfProject;
+	//map table id to the Conds that need for filter
+	map <int, set <Cond> >  mttCondFilter;
+	//map col to Join Cond
+	map <pair<int, int>, Cond> mctCondJoin;
+	//vector of Join Cond, if it is empty the query is done
+	vector <Cond> JConds;
+	//map table id to the expected row# after filter
+	map <int, int> mttRowNum;
+	for (i = 0; i < tables.size(); i++) {
+		mttRowNum[i] = tables[i].rows->count();
+	}	
+	for (i = 0; i < sp.join.size(); i++) {
+		int tid = columnId[sp.join[i].colA].first;
+		int cid = columnId[sp.join[i].colA].second;
+		mttcsJoin[tid].insert(cid);
+		mctCondJoin[make_pair(tid, cid)]=sp.join[i];
+
+		tid = columnId[sp.join[i].colB].first;
+		cid = columnId[sp.join[i].colB].second;
+		mttcsJoin[tid].insert(cid);
+		mctCondJoin[make_pair(tid, cid)]=sp.join[i];
+		JConds.push_back(sp.join[i]);
+		
+	}
+	for (i = 0; i < sp.range.size(); i++) {
+		int tid = columnId[sp.range[i].colName].first;
+		int cid = columnId[sp.range[i].colName].second;
+		mttCondFilter[tid].insert(sp.range[i]);	
+		mttRowNum[tid] = mttRowNum[tid]/tables[tid].columns[cid].index->count();
+	}
+	for (i = 0; i < sp.filter.size(); i++) {
+		int tid = columnId[sp.filter[i].colName].first;
+		mttCondFilter[tid].insert(sp.filter[i]);	
+		mttRowNum[tid] = mttRowNum[tid]/3;
+	}
+	/*for test
+	for (map <int, set <int> >::iterator it = mttcsJoin.begin();it != mttcsJoin.end(); it++) {
+		cout << "Table:" << it->first << " need join" << endl;
+		for ( set <int>::iterator jt = it->second.begin();jt != it->second.end(); jt++) {
+			cout << "\tcol" << (*jt) << endl;	
+		}
+	}	
+	for (map <int, set <Cond> >::iterator it = mttCondFilter.begin();it != mttCondFilter.end(); it++) {
+		cout << "Table:" << it->first << " need filter" << endl;
+		for (set <Cond>::iterator jt = it->second.begin(); jt != it->second.end(); jt++) {
+			cout << "\t" << jt->colName;
+			switch(jt->type) {
+				case SFIL:
+					cout << "=" << jt->c_string << endl;
+					break;
+				case IFIL:
+					cout << "=" << jt->c_int << endl;
+					break;
+				case RANG:
+					cout << jt->op << jt->c_int << endl;
+					break;
+			}
+		}
+	}
+	*/
+
 }
+
 
 int next(char *row)
 {
@@ -176,4 +241,7 @@ void close()
 	/* I have nothing to do. */
 }
 
-
+vector <int> filter(Table& t, set <Cond> FCond) {
+	
+	return vector <int>();
+}	
