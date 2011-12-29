@@ -159,7 +159,7 @@ void execute(const string& sql)
 	//map table id to the Conds that need for filter
 	map <int, set <Cond> >  mttCondFilter;
 	//map col to Join Cond
-	map <pair<int, int>, Cond> mctCondJoin;
+	map <pair<int, int>, set <Cond> > mctCondJoin;
 	//vector of Join Cond, if it is empty the query is done
 	vector <Cond> JConds;
 	//map table id to the expected row# after filter
@@ -171,12 +171,12 @@ void execute(const string& sql)
 		int tid = columnId[sp.join[i].colA].first;
 		int cid = columnId[sp.join[i].colA].second;
 		mttcsJoin[tid].insert(cid);
-		mctCondJoin[make_pair(tid, cid)]=sp.join[i];
+		mctCondJoin[make_pair(tid, cid)].insert(sp.join[i]);
 
 		tid = columnId[sp.join[i].colB].first;
 		cid = columnId[sp.join[i].colB].second;
 		mttcsJoin[tid].insert(cid);
-		mctCondJoin[make_pair(tid, cid)]=sp.join[i];
+		mctCondJoin[make_pair(tid, cid)].insert(sp.join[i]);
 		JConds.push_back(sp.join[i]);
 		
 	}
