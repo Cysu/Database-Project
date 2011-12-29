@@ -17,7 +17,6 @@ Table::Table(const string& name, const vector<string>& columnName,
 	// make rows
 	rows = new HashDB();
 	rows->open(("data/" + name + ".kch").c_str(), HashDB::OWRITER | HashDB::OCREATE);
-	totRows = 0;
 	rowLen = 0;
 	for (int i = 0; i < columns.size(); i ++) {
 		columns[i].offset = rowLen;
@@ -34,14 +33,12 @@ void Table::load(const vector<string>& initRows) {
 		byte* row = parse(initRows[i], i);
 		rows->set((byte*) &i, 4, row, rowLen);
 	}
-
-	totRows = initRows.size();
 }
 
 void Table::insert(const string& row) {
-	byte* wBuf = parse(row, totRows);
-	rows->set((byte*) &totRows, 4, wBuf, rowLen);
-	totRows++;
+	int rowNum = rows->count();
+	byte* wBuf = parse(row, rows->count());
+	rows->set((byte*) &rowNum, 4, wBuf, rowLen);
 }
 
 byte* Table::parse(const string& s, int rowNum) {

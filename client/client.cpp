@@ -128,6 +128,10 @@ void load(const string& table_name, const vector<string>& row)
 
 void preprocess()
 {
+	vector<int> ret = tables[0].columns[0].filterBy(5, GTR);
+	for (int i = 0; i < ret.size(); i ++)
+		cout << ret[i] << " ";
+	cout << endl;
 }
 
 void execute(const string& sql)
