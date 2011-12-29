@@ -15,5 +15,6 @@ class SQLParser {
 		vector <Cond> range;
 		vector <string> output;
 		vector <string> token;
+		vector <string> tables;
 };
 #endif
