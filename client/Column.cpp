@@ -31,11 +31,10 @@ void Column::insertIndex(string key, int rowNum) {
 	const byte* kBuf = key.c_str();
 	const byte* vBuf = (byte*) &rowNum;
 	index->append(kBuf, key.length(), vBuf, 4);
-	//printf("%s, %s, %d\n", name.c_str(), key.c_str(), rowNum);
+	printf("insertIndex: %s, %s, %d\n", name.c_str(), key.c_str(), rowNum);
 }
 
-vector<int> Column::filterBy(unsigned int key, OPR_TYPE opr) {
-	vector<int> ret;
+void Column::filterBy(unsigned int key, OPR_TYPE opr, vector<int>& ret) {
 	DB::Cursor* cur = index->cursor();
 	size_t size;
 	byte* vBuf;
@@ -82,6 +81,18 @@ vector<int> Column::filterBy(unsigned int key, OPR_TYPE opr) {
 	}
 	delete vBuf;
 	delete cur;
-	return ret;
 }
+
+void Column::filterBy(string key, vector<int>& ret) {
+	size_t size;
+	byte* vBuf = index->get(key.c_str(), key.length(), &size);
+	for (int i = 0; i < size; i += 4) {
+		int t = *((int*)(vBuf + i));
+		ret.push_back(t);
+	}
+	delete vBuf;
+}
+	
+		
+
 

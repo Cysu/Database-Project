@@ -24,7 +24,9 @@ public:
 	void insertIndex(string key, int rowNum);
 	void insertIndex(unsigned int key, int rowNum);
 
-	vector<int> filterBy(unsigned int key, OPR_TYPE opr);
+	void filterBy(unsigned int key, OPR_TYPE opr, vector<int>& ret);
+	void filterBy(string key, vector<int>& ret);
+	
 };
 
 #endif // COLUMN_H

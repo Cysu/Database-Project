@@ -1,6 +1,0 @@
-2
-SELECT o_date, c_data, c_first, c_last, ol_amount, i_name FROM _order, customer, order_line, item WHERE o_id = c_id AND o_id = 1 AND o_id < 12;
-50.0
-SELECT i_name, i_data FROM item WHERE i_id = 1;
-50.0
-

@@ -1,4 +1,7 @@
-test/*
+test/
+data/
 run
-client/*.o
+*.o
+*.swp
+
 
