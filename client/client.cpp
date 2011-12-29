@@ -25,7 +25,7 @@ vector<Table> tables;
 map<string, int> tableId;
 map<string, pair<int, int> > columnId;
 
-set <int> filter(Table& t, set <Cond> FCond); 
+set <int> filter(Table& t, const set <Cond>& FCond); 
 
 void done(const vector<string>& table, const map<string, int>& m,
 	int depth, vector<string>& row)
@@ -88,10 +88,7 @@ void train(const vector<string>& query, const vector<double>& weight)
 	pair<int, int> tmp;
 	for (int i = 0; i < query.size(); i++) {
 		SQLParser sp(query[i]);
-		cout << "Join:";
 		for (int j = 0; j < sp.join.size(); j++) {
-			cout << sp.join[j].colA << "=" << sp.join[j].colB;
-			cout << " ";
 
 			// mark to index
 			tmp = columnId[sp.join[j].colA];
@@ -99,39 +96,26 @@ void train(const vector<string>& query, const vector<double>& weight)
 			tmp = columnId[sp.join[j].colB];
 			tables[tmp.first].columns[tmp.second].needIndex = true;
 		}
-		cout << "\nFilter:";
 		for (int j = 0; j < sp.filter.size(); j++) {
-			cout << sp.filter[j].colName << "=";
-			if (sp.filter[j].type == IFIL)
-				cout << sp.filter[j].c_int;
-			else
-				cout << sp.filter[j].c_string;
-			cout << " ";
 
 			tmp = columnId[sp.filter[j].colName];
 			tables[tmp.first].columns[tmp.second].needIndex = true;
 		}
-		cout << "\nRange:";
 		for (int j = 0; j < sp.range.size(); j++) {
-			cout << sp.range[j].colName << sp.range[j].op << sp.range[j].c_int;
-			cout << " ";
 
 			tmp = columnId[sp.range[j].colName];
 			tables[tmp.first].columns[tmp.second].needIndex = true;
 		}	
-		cout << "\n";
 	}
 }
 
 void load(const string& table_name, const vector<string>& row)
 {
 	tables[tableId[table_name]].load(row);
-	cout << "load: " << tables[0].rows->count() << endl;
 }
 
 void preprocess()
 {
-	cout << "preprocess: " << tables[0].rows->count() << endl;
 }
 
 void execute(const string& sql)
@@ -140,7 +124,6 @@ void execute(const string& sql)
 	map<string, int> m;
 	int i;
 
-	cout << "execute: " << tables[0].rows->count() << endl;
 
 	result.clear();
 	cout << sql << endl;
@@ -172,7 +155,7 @@ void execute(const string& sql)
 	map <int, int> mttRowNum;
 	for (i = 0; i < tables.size(); i++) {
 		mttRowNum[i] = tables[i].rows->count();
-		cout << mttRowNum[i] << endl;
+		//cout << mttRowNum[i] << endl;
 	}	
 	for (i = 0; i < sp.join.size(); i++) {
 		int tid = columnId[sp.join[i].colA].first;
@@ -205,13 +188,13 @@ void execute(const string& sql)
 			cout << "\tcol" << (*jt) << endl;	
 		}
 	}	
-	*/
 	for (map <int, set <Cond> >::iterator it = mttFCond.begin();it != mttFCond.end(); it++) {
 		cout << "Table:" << it->first << endl;
 		set <int> s = filter(tables[it->first], it->second);
 		for (set <int>::iterator jt = s.begin(); jt != s.end(); jt++)
 			cout << "\tcol:" << (*jt) << " is selected\n";
 	}
+	*/
 }
 
 
@@ -236,7 +219,7 @@ void close()
 	/* I have nothing to do. */
 }
 
-set <int> filter(Table& t, set <Cond> FCond) {
+set <int> filter(Table& t, const set <Cond>& FCond) {
 	bool found = false;
 	set <int> s[2];
 	vector <int> temp;
@@ -270,11 +253,10 @@ set <int> filter(Table& t, set <Cond> FCond) {
 		}
 		found = true;
 		p = (p+1)&1;
-
 	}
 	if (!found) {
 		for (int i = 0; i < t.rows->count(); i++)
 			s[1].insert(i);
 	}
-	return s[p+1];
+	return s[p];
 }	
