@@ -25,6 +25,26 @@ vector<string> result;
 set <int> filter(Table& t, const set <Cond>& FCond); 
 void getJoinOrder(int*);
 
+//maps table id to the col ids that used for join or project
+//i.e. the col that need to be read from The BIG TABLE
+map <int, set <int> > mttcsJoin/*, mttcsfProject*/;
+
+//map table id to the Conds that need for filter
+map <int, set <Cond> >  mttFCond/*, mttRCond*/;
+
+//map col to Join Cond
+map <pair<int, int>, set <Cond> > mctCondJoin;
+
+//set of Join Cond, if it is empty the query is done
+set <Cond> JConds;
+
+//map table id to the expected row# after filter
+map <int, int> mttRowNum;
+
+void initJoinGraph(SQLParser& sp);
+void genJoinOrder(SQLParser& sp, int* joinOrder);
+void genOutput(SQLParser& sp, int* joinOrder, JoinAgent& ja);
+
 void create(const string& table_name, const vector<string>& column_name,
 	const vector<string>& column_type, const vector<string>& primary_key)
 {
@@ -94,21 +114,50 @@ void execute(const string& sql)
 	//SELECT
 	SQLParser sp(sql);
 
-	//maps table id to the col ids that used for join or project
-	//i.e. the col that need to be read from The BIG TABLE
-	map <int, set <int> > mttcsJoin, mttcsfProject;
-	//map table id to the Conds that need for filter
-	map <int, set <Cond> >  mttFCond, mttRCond;
-	//map col to Join Cond
-	map <pair<int, int>, set <Cond> > mctCondJoin;
-	//set of Join Cond, if it is empty the query is done
-	set <Cond> JConds;
-	//map table id to the expected row# after filter
-	map <int, int> mttRowNum;
-	for (i = 0; i < tables.size(); i++) {
+	initJoinGraph(sp);
+
+	int joinOrder[JConds.size()*4];
+	genJoinOrder(sp, joinOrder);
+
+	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
+	set<int> f = filter(tables[joinOrder[0]], mttFCond[joinOrder[0]]);
+	ja.init(f);
+	for (int i = 0; i < JConds.size(); i ++) {
+		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
+		ja.join(i, f);
+	}
+	
+	genOutput(sp, joinOrder, ja);
+}
+
+
+int next(char *row)
+{
+	if (result.size() == 0)
+		return (0);
+	strcpy(row, result.back().c_str());
+	result.pop_back();
+
+	printf("%s\n", row);
+
+	return (1);
+}
+
+void close()
+{
+}
+
+void initJoinGraph(SQLParser& sp) {
+	mttRowNum.clear();
+	mttcsJoin.clear();
+	mctCondJoin.clear();
+	mttFCond.clear();
+	JConds.clear();
+
+	for (int i = 0; i < tables.size(); i++) {
 		mttRowNum[i] = tables[i].rows->count();
 	}	
-	for (i = 0; i < sp.join.size(); i++) {
+	for (int i = 0; i < sp.join.size(); i++) {
 		int tid = columnId[sp.join[i].colA].first;
 		int cid = columnId[sp.join[i].colA].second;
 		mttcsJoin[tid].insert(cid);
@@ -121,23 +170,24 @@ void execute(const string& sql)
 		JConds.insert(sp.join[i]);
 		
 	}
-	for (i = 0; i < sp.filter.size(); i++) {
+	for (int i = 0; i < sp.filter.size(); i++) {
 		int tid = columnId[sp.filter[i].colName].first;
 		int cid = columnId[sp.filter[i].colName].second;
 		mttFCond[tid].insert(sp.filter[i]);	
 		mttRowNum[tid] = mttRowNum[tid]/tables[tid].columns[cid].index->count();
 	}
-	for (i = 0; i < sp.range.size(); i++) {
+	for (int i = 0; i < sp.range.size(); i++) {
 		int tid = columnId[sp.range[i].colName].first;
 		mttFCond[tid].insert(sp.range[i]);	
 		mttRowNum[tid] = mttRowNum[tid]/3;
 	}
+}
 
-	int* joinOrder = new int[JConds.size()*4];
+void genJoinOrder(SQLParser&sp, int* joinOrder) {
 	int* q = joinOrder;
 	int min = 2147483647;
 	int curTable;
-	for (i = 0; i < sp.tables.size(); i++)
+	for (int i = 0; i < sp.tables.size(); i++)
 		if (mttRowNum[tableId[sp.tables[i]]] < min) {
 			min = mttRowNum[tableId[sp.tables[i]]];
 			curTable = tableId[sp.tables[i]];
@@ -185,18 +235,10 @@ void execute(const string& sql)
 		oldConds.insert(toJoin);
 		curConds.erase(toJoin);
 	}
+}
 
-	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
-	set<int> f = filter(tables[joinOrder[0]], mttFCond[joinOrder[0]]);
-	ja.init(f);
-	//ja.output(ja.ret);
-	for (int i = 0; i < JConds.size(); i ++) {
-		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
-		ja.join(i, f);
-	}
-	//ja.output(ja.ret);
-	
-	for (i = 0; i < sp.output.size(); i++) {
+void genOutput(SQLParser& sp, int* joinOrder, JoinAgent& ja) {
+	for (int i = 0; i < sp.output.size(); i++) {
 		int tid = columnId[sp.output[i]].first;
 		int cid = columnId[sp.output[i]].second;
 		int rid;
@@ -213,7 +255,7 @@ void execute(const string& sql)
 			size_t rowLen;
 			rowContent = tables[tid].rows->get((byte*)&(ja.ret[j][rid]), 4, &rowLen);
 			int colOffset = tables[tid].columns[cid].offset;
-		       	int colLen = tables[tid].columns[cid].len;
+			int colLen = tables[tid].columns[cid].len;
 			if (tables[tid].columns[cid].type == INT) {
 				unsigned int t = *(rowContent + colOffset);
 				char buf[20];
@@ -224,28 +266,7 @@ void execute(const string& sql)
 				result[j] += t + ",";
 			}
 		}
-			
-
 	}
-
-	delete joinOrder;
-}
-
-
-int next(char *row)
-{
-	if (result.size() == 0)
-		return (0);
-	strcpy(row, result.back().c_str());
-	result.pop_back();
-
-	printf("%s\n", row);
-
-	return (1);
-}
-
-void close()
-{
 }
 
 set <int> filter(Table& t, const set <Cond>& FCond) {

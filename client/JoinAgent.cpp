@@ -49,7 +49,6 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 			}
 		}
 		addTo(newRet, j, i, matchRows, filterRet);
-		output(newRet);
 	}
 
 	for (int j = 0; j < ret.size(); j ++)
