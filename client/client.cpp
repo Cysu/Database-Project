@@ -128,18 +128,29 @@ void execute(const string& sql)
 	initJoinGraph(sp);
 	joinOrder = new int[JConds.size()*4];	// delete at the end of next()
 	genJoinOrder(sp, joinOrder);
-	for (int i = 0; i < JConds.size(); i += 4)
-		printf("%d %d %d %d\n", joinOrder[i], joinOrder[i + 1], joinOrder[i + 2], joinOrder[i + 3]);
 
 	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
-	set<int> f = filter(tables[joinOrder[0]], mttFCond[joinOrder[0]]);
+	set<int> f;
+	if (JConds.size() > 0) {
+		f = filter(tables[joinOrder[0]], mttFCond[joinOrder[0]]);
+	} else {
+		f = filter(tables[tableId[sp.tables[0]]], mttFCond[tableId[sp.tables[0]]]);
+	}
+
 	ja.init(f);
+//	ja.output(ja.ret);
 	for (int i = 0; i < JConds.size(); i ++) {
 		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
 		ja.join(i, f);
 	}
 	jaRet = ja.ret;	
+	ja.output(ja.ret);
+	if (JConds.size() <= 0) {
+		joinOrder = new int[1];
+		joinOrder[0] = tableId[sp.tables[0]];
+	}
 	outputRowNum = 0;
+	cout << "ok" << endl;
 	genOutput(0, BLOCK_SIZE);
 }
 
@@ -292,11 +303,13 @@ void genOutput(int start, int len) {
 			size_t rowLen;
 			//find the col num in jaRet that store the rowId of table i
 			int pos;
-			for (pos = 0; pos < sizeof(joinOrder) / 4; pos++)
-				if (joinOrder[pos * 4] == i)
-					break;
-			if (joinOrder[sizeof(joinOrder) * 4 - 2] == i)
-				pos = sizeof(joinOrder);
+			if (joinOrder[0] == i)
+				pos = 0;
+			else {
+				for (pos = 1; pos < sizeof(joinOrder) / 4; pos++)
+					if (joinOrder[pos * 4 - 2] == i)
+						break;
+			}
 			rowContent = tables[i].rows->get((byte*)&(jaRet[jj][pos]), 4, &rowLen);
 			//get the data...
 			for (int k = 0; k < cids.size(); k++) {

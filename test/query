@@ -1,2 +1,101 @@
-1
-SELECT b_1, a_1 FROM B, A WHERE b_0 = a_0 AND b_1 = 'v' AND a_0 = 5
+100
+SELECT c_1, e_1, a_1, d_1 FROM C, E, A, D WHERE c_4 = e_4 AND c_3 = a_3 AND e_2 = d_2
+SELECT b_1, d_1 FROM B, D WHERE b_3 = d_3 AND d_0 = 369 AND d_2 = 254 AND d_1 = 'mpzwf' AND d_0 = 392 AND d_3 = 'ueg' AND d_3 = 'eoxqjo' AND d_3 = 'vqyvym' AND b_4 = 944
+SELECT b_1 FROM B WHERE b_0 = 951
+SELECT d_1 FROM D WHERE d_1 = 'h' AND d_1 = 'sculg'
+SELECT b_1, d_1, e_1, a_1 FROM B, D, E, A WHERE b_0 = d_0 AND d_4 = e_4 AND d_0 = a_0 AND e_0 = 929 AND e_3 = 'pe' AND d_2 = 110 AND e_2 = 20 AND b_4 = 333 AND d_4 = 589 AND e_2 = 698
+SELECT c_1, b_1, d_1, a_1 FROM C, B, D, A WHERE c_0 = b_0 AND c_2 = d_2 AND c_4 = a_4 AND d_0 = 317 AND b_3 = 'xkwhn' AND b_3 = 'fz' AND c_3 = 'rp' AND c_1 = 'mp'
+SELECT a_1, d_1 FROM A, D WHERE a_0 = d_0 AND a_4 = 98 AND d_1 = 'l' AND d_1 = 'u' AND d_2 = 721 AND a_3 = 'bbsolz'
+SELECT e_1, c_1, b_1 FROM E, C, B WHERE e_3 = c_3 AND c_0 = b_0 AND e_4 = 591 AND b_2 = 671 AND c_3 = 'bofcpi' AND e_4 = 227 AND e_0 = 861 AND e_4 = 70 AND b_0 = 237
+SELECT d_1, c_1, b_1, a_1 FROM D, C, B, A WHERE d_4 = c_4 AND d_4 = b_4 AND c_4 = a_4 AND d_0 = 317 AND c_1 = 'bxec' AND d_1 = 'tk' AND b_4 = 272 AND b_2 = 355
+SELECT c_1, a_1, b_1 FROM C, A, B WHERE c_0 = a_0 AND a_1 = b_1 AND a_4 = 509 AND c_4 = 630 AND a_2 = 39 AND c_4 = 8 AND b_4 = 429 AND c_3 = 'k' AND a_0 = 375
+SELECT d_1, c_1, b_1, e_1 FROM D, C, B, E WHERE d_3 = c_3 AND d_3 = b_3 AND b_2 = e_2 AND d_3 = 'gz' AND b_3 = 'qx' AND b_3 = 'sgsen'
+SELECT c_1, e_1, a_1, d_1 FROM C, E, A, D WHERE c_4 = e_4 AND c_3 = a_3 AND e_2 = d_2
+SELECT c_1, a_1, e_1, b_1 FROM C, A, E, B WHERE c_2 = a_2 AND a_1 = e_1 AND e_2 = b_2 AND b_1 = 'r' AND e_3 = 'v' AND e_2 = 71
+SELECT a_1, c_1, e_1, d_1 FROM A, C, E, D WHERE a_3 = c_3 AND a_0 = e_0 AND a_1 = d_1
+SELECT e_1, d_1 FROM E, D WHERE e_4 = d_4 AND d_3 = 'a' AND d_1 = 'ms'
+SELECT b_1, a_1, e_1, c_1 FROM B, A, E, C WHERE b_0 = a_0 AND a_4 = e_4 AND e_3 = c_3 AND c_3 = 'itrmw' AND b_2 = 836
+SELECT a_1, b_1, c_1, d_1 FROM A, B, C, D WHERE a_3 = b_3 AND a_1 = c_1 AND a_2 = d_2
+SELECT c_1 FROM C 
+SELECT d_1, c_1, a_1, b_1 FROM D, C, A, B WHERE d_3 = c_3 AND d_3 = a_3 AND d_0 = b_0
+SELECT c_1, d_1, b_1, a_1 FROM C, D, B, A WHERE c_4 = d_4 AND c_1 = b_1 AND b_0 = a_0
+SELECT d_1, c_1 FROM D, C WHERE d_1 = c_1 AND c_3 = 'zlbs' AND d_0 = 33 AND d_0 = 151 AND d_2 = 287 AND d_4 = 954 AND c_3 = 'gkghx' AND c_4 = 510 AND d_1 = 'vgaw' AND d_2 = 273
+SELECT b_1, e_1 FROM B, E WHERE b_3 = e_3 AND b_0 = 212 AND b_2 = 920 AND b_1 = 'ij'
+SELECT c_1 FROM C WHERE c_2 = 483 AND c_1 = 'cbgl' AND c_4 = 450 AND c_0 = 335 AND c_4 = 140 AND c_3 = 'yyvfgg' AND c_1 = 'wv' AND c_1 = 'e' AND c_4 = 806
+SELECT e_1, c_1, d_1 FROM E, C, D WHERE e_0 = c_0 AND c_2 = d_2 AND e_3 = 'b'
+SELECT b_1, a_1 FROM B, A WHERE b_2 = a_2 AND a_2 = 196 AND b_2 = 389
+SELECT b_1, a_1 FROM B, A WHERE b_4 = a_4 AND b_2 = 150
+SELECT e_1, d_1 FROM E, D WHERE e_0 = d_0 AND e_1 = 'wqri' AND d_4 = 348 AND e_3 = 'o' AND e_4 = 821 AND d_4 = 258 AND d_2 = 164 AND d_4 = 705 AND d_0 = 168 AND e_4 = 757
+SELECT e_1 FROM E WHERE e_1 = 'bc'
+SELECT d_1 FROM D 
+SELECT b_1 FROM B WHERE b_3 = 'pj' AND b_0 = 8
+SELECT e_1, d_1, c_1 FROM E, D, C WHERE e_4 = d_4 AND e_4 = c_4 AND d_0 = 882
+SELECT b_1, e_1, d_1 FROM B, E, D WHERE b_0 = e_0 AND b_0 = d_0 AND d_3 = 'j' AND d_0 = 36 AND b_0 = 396 AND d_4 = 110 AND e_1 = 'mxv' AND b_2 = 921 AND e_1 = 'nci' AND e_4 = 218
+SELECT c_1, a_1, d_1, e_1 FROM C, A, D, E WHERE c_3 = a_3 AND c_0 = d_0 AND a_1 = e_1 AND d_2 = 763 AND d_4 = 802 AND a_3 = 'nqsa' AND a_0 = 929 AND d_0 = 205
+SELECT e_1 FROM E WHERE e_4 = 234 AND e_3 = 'cavic' AND e_2 = 871 AND e_1 = 'r' AND e_1 = 'tblhff'
+SELECT b_1 FROM B WHERE b_3 = 'oya' AND b_1 = 'zlf' AND b_0 = 744 AND b_4 = 586 AND b_2 = 325 AND b_3 = 't' AND b_2 = 70 AND b_0 = 781 AND b_0 = 830
+SELECT c_1, b_1, a_1 FROM C, B, A WHERE c_3 = b_3 AND c_1 = a_1 AND a_2 = 858
+SELECT d_1 FROM D WHERE d_0 = 121 AND d_0 = 770 AND d_2 = 224 AND d_1 = 'obxurp' AND d_4 = 624 AND d_2 = 880
+SELECT d_1, e_1, c_1 FROM D, E, C WHERE d_4 = e_4 AND d_2 = c_2
+SELECT b_1, c_1, e_1 FROM B, C, E WHERE b_0 = c_0 AND b_2 = e_2 AND e_4 = 135 AND e_3 = 'dvpplr' AND e_0 = 273 AND b_4 = 346 AND b_0 = 41 AND e_2 = 529 AND c_1 = 'nm' AND b_0 = 845
+SELECT a_1, e_1, b_1, c_1 FROM A, E, B, C WHERE a_4 = e_4 AND e_0 = b_0 AND e_0 = c_0 AND b_1 = 'wsn' AND b_0 = 932 AND a_4 = 542 AND b_0 = 791 AND a_4 = 951 AND e_3 = 'heldwv' AND a_3 = 'lvjnre' AND e_1 = 'htsv' AND e_4 = 839
+SELECT a_1, c_1 FROM A, C WHERE a_3 = c_3 AND a_0 = 327 AND c_3 = 'dgdob' AND c_1 = 'vf'
+SELECT a_1, c_1, e_1 FROM A, C, E WHERE a_0 = c_0 AND c_0 = e_0 AND a_1 = 'sfle' AND e_4 = 206 AND e_4 = 99 AND c_3 = 'h' AND e_3 = 'nzq' AND e_2 = 232 AND c_2 = 112 AND e_3 = 'we' AND e_1 = 'rujlrh'
+SELECT e_1, b_1, d_1, a_1 FROM E, B, D, A WHERE e_2 = b_2 AND e_0 = d_0 AND b_4 = a_4 AND a_1 = 'qm' AND b_0 = 191 AND e_3 = 'didmva' AND a_4 = 396 AND d_2 = 812
+SELECT a_1 FROM A WHERE a_2 = 713 AND a_4 = 392 AND a_0 = 640 AND a_4 = 645 AND a_2 = 696 AND a_1 = 'u'
+SELECT c_1, b_1, e_1, d_1 FROM C, B, E, D WHERE c_4 = b_4 AND c_3 = e_3 AND e_2 = d_2 AND b_1 = 'zbifa' AND b_0 = 502 AND e_2 = 379 AND e_2 = 688
+SELECT a_1 FROM A WHERE a_3 = 'iovg' AND a_3 = 'wv' AND a_1 = 'ihc' AND a_3 = 'qwea' AND a_2 = 864
+SELECT c_1, b_1, a_1, d_1 FROM C, B, A, D WHERE c_1 = b_1 AND c_4 = a_4 AND c_2 = d_2 AND b_0 = 629 AND c_4 = 682 AND a_1 = 'ffpmh'
+SELECT e_1 FROM E WHERE e_4 = 350 AND e_1 = 'w' AND e_0 = 114 AND e_1 = 'txspbu' AND e_1 = 'qq' AND e_4 = 126 AND e_0 = 123
+SELECT c_1, e_1, a_1 FROM C, E, A WHERE c_1 = e_1 AND e_0 = a_0 AND e_0 = 134 AND c_2 = 609 AND c_1 = 'nclyu'
+SELECT a_1 FROM A WHERE a_0 = 100 AND a_4 = 752 AND a_3 = 'jzmkmn'
+SELECT a_1, d_1, b_1 FROM A, D, B WHERE a_1 = d_1 AND a_2 = b_2 AND a_1 = 'emlf' AND a_3 = 'urgz' AND a_0 = 750 AND d_0 = 459 AND d_0 = 637
+SELECT d_1 FROM D WHERE d_0 = 680 AND d_0 = 484 AND d_4 = 755
+SELECT c_1 FROM C WHERE c_3 = 'n' AND c_3 = 'fzbon' AND c_3 = 'degjoe' AND c_0 = 976 AND c_4 = 727 AND c_1 = 'jambph' AND c_4 = 448 AND c_2 = 694
+SELECT e_1, c_1, a_1 FROM E, C, A WHERE e_0 = c_0 AND c_1 = a_1 AND c_4 = 424 AND a_3 = 'et' AND c_2 = 394 AND c_1 = 'ep' AND c_4 = 140 AND a_0 = 782
+SELECT d_1, e_1 FROM D, E WHERE d_1 = e_1 AND e_0 = 722 AND d_4 = 146 AND d_4 = 649 AND d_0 = 612 AND d_4 = 159 AND d_4 = 285
+SELECT c_1 FROM C WHERE c_0 = 831
+SELECT d_1, b_1, e_1 FROM D, B, E WHERE d_0 = b_0 AND b_4 = e_4
+SELECT b_1 FROM B WHERE b_4 = 192
+SELECT c_1 FROM C WHERE c_0 = 919 AND c_2 = 945
+SELECT b_1 FROM B WHERE b_0 = 44 AND b_3 = 'fzp'
+SELECT e_1, b_1 FROM E, B WHERE e_4 = b_4 AND e_3 = 'o' AND b_1 = 'nbv' AND e_2 = 386 AND e_3 = 'lx' AND b_4 = 705 AND b_0 = 864 AND b_1 = 'rqvl' AND e_3 = 'exdt' AND e_3 = 'uynoi'
+SELECT e_1 FROM E WHERE e_4 = 107
+SELECT b_1, a_1 FROM B, A WHERE b_2 = a_2 AND b_0 = 282 AND b_2 = 52 AND b_1 = 'ysgt' AND a_0 = 523 AND a_2 = 903 AND b_2 = 954 AND a_0 = 205 AND a_1 = 'fvu' AND a_3 = 'q'
+SELECT d_1, b_1, c_1, e_1 FROM D, B, C, E WHERE d_0 = b_0 AND b_4 = c_4 AND b_3 = e_3 AND d_2 = 959 AND c_4 = 976 AND e_0 = 238 AND d_4 = 989 AND c_0 = 919 AND b_3 = 'yskeel'
+SELECT c_1, b_1, e_1 FROM C, B, E WHERE c_4 = b_4 AND c_2 = e_2 AND e_2 = 792 AND e_4 = 382 AND e_3 = 'cslniq'
+SELECT d_1 FROM D WHERE d_3 = 'uti' AND d_2 = 101 AND d_0 = 573 AND d_2 = 157 AND d_0 = 571 AND d_1 = 'liby' AND d_4 = 447 AND d_2 = 225
+SELECT c_1, d_1, e_1, a_1 FROM C, D, E, A WHERE c_1 = d_1 AND c_0 = e_0 AND e_0 = a_0
+SELECT d_1, c_1, b_1, a_1 FROM D, C, B, A WHERE d_0 = c_0 AND d_4 = b_4 AND d_4 = a_4
+SELECT d_1, b_1, e_1 FROM D, B, E WHERE d_2 = b_2 AND d_4 = e_4 AND d_0 = 400 AND b_0 = 323 AND d_0 = 878
+SELECT a_1, c_1 FROM A, C WHERE a_2 = c_2 AND c_2 = 308 AND a_0 = 499
+SELECT a_1, c_1, b_1 FROM A, C, B WHERE a_3 = c_3 AND c_4 = b_4 AND c_4 = 83
+SELECT e_1 FROM E WHERE e_1 = 'rix' AND e_1 = 'yx' AND e_4 = 640 AND e_4 = 100 AND e_4 = 322 AND e_4 = 77 AND e_1 = 'nyf' AND e_0 = 173
+SELECT b_1, a_1 FROM B, A WHERE b_2 = a_2 AND a_1 = 'qa' AND a_4 = 640 AND b_4 = 425 AND b_3 = 'dvfuvu' AND a_4 = 934 AND b_0 = 871
+SELECT c_1, b_1, e_1, d_1 FROM C, B, E, D WHERE c_1 = b_1 AND c_0 = e_0 AND b_3 = d_3 AND b_4 = 227 AND e_4 = 851 AND b_2 = 552 AND c_4 = 49 AND e_1 = 'g' AND d_1 = 'hlnpk'
+SELECT d_1, b_1, e_1, a_1 FROM D, B, E, A WHERE d_2 = b_2 AND d_0 = e_0 AND e_1 = a_1 AND d_0 = 572
+SELECT e_1, c_1, a_1 FROM E, C, A WHERE e_4 = c_4 AND e_3 = a_3 AND c_1 = 'g' AND a_0 = 743
+SELECT d_1, e_1, c_1 FROM D, E, C WHERE d_1 = e_1 AND d_4 = c_4 AND d_0 = 411 AND c_2 = 282 AND c_2 = 756 AND e_2 = 957 AND d_0 = 170
+SELECT d_1, c_1 FROM D, C WHERE d_3 = c_3 AND d_0 = 321 AND d_0 = 395
+SELECT e_1, b_1, d_1 FROM E, B, D WHERE e_1 = b_1 AND b_2 = d_2 AND d_1 = 'jpdap' AND e_1 = 't' AND e_2 = 318 AND b_2 = 716
+SELECT e_1 FROM E WHERE e_2 = 830 AND e_2 = 722 AND e_4 = 407 AND e_2 = 850 AND e_4 = 103 AND e_1 = 'usf'
+SELECT a_1, c_1, e_1, d_1 FROM A, C, E, D WHERE a_2 = c_2 AND a_3 = e_3 AND e_4 = d_4 AND e_3 = 'xnz' AND a_2 = 104 AND e_0 = 455 AND e_2 = 163 AND e_2 = 750 AND c_3 = 'mija' AND a_4 = 174
+SELECT a_1 FROM A WHERE a_3 = 'h' AND a_0 = 523
+SELECT b_1, d_1, e_1 FROM B, D, E WHERE b_2 = d_2 AND b_0 = e_0 AND e_3 = 'nqpy' AND d_1 = 'nx' AND b_4 = 576 AND b_3 = 'pitf' AND d_3 = 'r' AND d_2 = 787 AND d_4 = 674 AND b_3 = 'wk' AND d_4 = 625
+SELECT b_1, a_1, d_1, e_1 FROM B, A, D, E WHERE b_0 = a_0 AND b_2 = d_2 AND d_3 = e_3 AND e_3 = 'jfq' AND d_0 = 906 AND b_4 = 106 AND a_2 = 633 AND d_2 = 626
+SELECT a_1, b_1 FROM A, B WHERE a_4 = b_4 AND b_4 = 36 AND b_0 = 263 AND b_3 = 'c' AND a_0 = 436
+SELECT b_1, e_1 FROM B, E WHERE b_2 = e_2 AND b_3 = 'gmf' AND e_1 = 'qpkvf' AND e_2 = 426 AND b_3 = 'ge' AND e_4 = 194 AND e_2 = 55 AND b_2 = 533 AND b_0 = 574
+SELECT b_1, a_1, d_1 FROM B, A, D WHERE b_0 = a_0 AND a_3 = d_3 AND d_4 = 937 AND a_1 = 'axggdj'
+SELECT b_1, c_1, e_1 FROM B, C, E WHERE b_1 = c_1 AND b_3 = e_3 AND c_4 = 975 AND e_1 = 'iglvd'
+SELECT d_1, b_1 FROM D, B WHERE d_2 = b_2 AND d_4 = 392 AND d_3 = 'b' AND b_0 = 291 AND b_4 = 104 AND d_4 = 264 AND d_0 = 0
+SELECT b_1, d_1, a_1, e_1 FROM B, D, A, E WHERE b_4 = d_4 AND d_0 = a_0 AND b_2 = e_2 AND d_2 = 20 AND a_0 = 802 AND d_3 = 'wcr' AND a_2 = 865
+SELECT a_1, b_1, e_1, d_1 FROM A, B, E, D WHERE a_1 = b_1 AND a_4 = e_4 AND b_3 = d_3 AND e_0 = 66
+SELECT a_1, d_1, c_1, b_1 FROM A, D, C, B WHERE a_4 = d_4 AND d_0 = c_0 AND a_1 = b_1 AND c_4 = 927 AND a_2 = 652 AND d_2 = 341 AND d_0 = 22 AND a_2 = 440 AND b_2 = 231
+SELECT b_1, e_1 FROM B, E WHERE b_1 = e_1 AND e_2 = 96 AND b_4 = 764 AND e_0 = 668 AND b_0 = 593 AND b_0 = 570
+SELECT c_1, b_1, e_1, d_1 FROM C, B, E, D WHERE c_1 = b_1 AND b_3 = e_3 AND e_0 = d_0 AND c_3 = 'jtfby' AND c_4 = 164 AND e_4 = 109
+SELECT c_1, b_1 FROM C, B WHERE c_1 = b_1 AND c_0 = 400 AND b_0 = 951 AND c_1 = 'wmvd' AND b_0 = 106 AND c_4 = 954 AND c_4 = 471 AND c_0 = 580 AND b_2 = 612
+SELECT d_1, c_1, b_1 FROM D, C, B WHERE d_2 = c_2 AND c_1 = b_1 AND c_2 = 993 AND b_1 = 'tbf' AND d_4 = 266 AND b_2 = 430 AND d_1 = 'nb'
+SELECT c_1, d_1, a_1 FROM C, D, A WHERE c_0 = d_0 AND c_4 = a_4 AND c_2 = 425 AND c_0 = 469 AND d_1 = 'x' AND c_0 = 940 AND a_4 = 120
+SELECT e_1, b_1 FROM E, B WHERE e_1 = b_1 AND e_1 = 'ti'
+SELECT e_1, c_1 FROM E, C WHERE e_3 = c_3 AND e_4 = 283 AND c_3 = 'cfkwkx' AND e_1 = 'p' AND e_0 = 147 AND c_1 = 'kczf' AND c_1 = 'x'
+SELECT d_1 FROM D WHERE d_1 = 'r' AND d_4 = 927

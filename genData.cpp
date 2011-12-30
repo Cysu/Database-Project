@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int MAX_INT = 30;
+const int MAX_INT = 1000;
 const int MAX_STRING = 6;
 
 int getRandomInt(int range) {
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		// WHERE a_2 = b_2 AND a_0 = c_0
-		query += "WHERE ";
+		if (m > 1) query += "WHERE ";
 		for (int j = 1; j < m; j ++) {
 			int ta = qTables[rand() % j];
 			int tb = qTables[j];
@@ -122,6 +122,7 @@ int main(int argc, char* argv[]) {
 		int nConds = rand() % 10;
 		for (int j = 0; j < nConds; j ++) {
 			if (j > 0 || m > 1) query += " AND ";
+			else if (j == 0 && m == 1) query += "WHERE ";
 			int t = qTables[rand() % m];
 			int c = rand() % nCols;
 			query += ('a' + t);
