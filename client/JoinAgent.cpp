@@ -45,11 +45,15 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 				tables[tIdB].columns[cIdB].filterBy(t, EQU, matchRows);
 			} else {
 				string t = rowContent + colOffset;
+				cout << t << endl;
 				tables[tIdB].columns[cIdB].filterBy(t, matchRows);
 			}
 		}
 		addTo(newRet, j, i, matchRows, filterRet);
+		output(newRet);
 	}
+	delete rowContent;
+
 
 	for (int j = 0; j < ret.size(); j ++)
 		delete ret[j];
@@ -57,6 +61,7 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 }
 
 void JoinAgent::sort(int t, int l, int r) {
+	if (l >= r) return;
 	int i = l, j = r, x = ret[(l + r) >> 1][t];
 	while (i <= j) {
 		while (ret[i][t] < x) i ++;

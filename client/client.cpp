@@ -126,7 +126,7 @@ void execute(const string& sql)
 		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
 		ja.join(i, f);
 	}
-	
+
 	genOutput(sp, joinOrder, ja);
 }
 
@@ -238,6 +238,9 @@ void genJoinOrder(SQLParser&sp, int* joinOrder) {
 }
 
 void genOutput(SQLParser& sp, int* joinOrder, JoinAgent& ja) {
+	byte* rowContent = NULL;
+	for (int j = 0; j < ja.ret.size(); j++)
+		result.push_back(string());
 	for (int i = 0; i < sp.output.size(); i++) {
 		int tid = columnId[sp.output[i]].first;
 		int cid = columnId[sp.output[i]].second;
@@ -248,9 +251,6 @@ void genOutput(SQLParser& sp, int* joinOrder, JoinAgent& ja) {
 		if (tid == joinOrder[JConds.size() * 4 - 2])
 			rid = JConds.size();
 		ja.sort(rid, 0, ja.ret.size()-1);
-		for (int j = 0; j < ja.ret.size(); j++)
-			result.push_back(string());
-		byte* rowContent = NULL;
 		for (int j = 0; j < ja.ret.size(); j++) {
 			size_t rowLen;
 			rowContent = tables[tid].rows->get((byte*)&(ja.ret[j][rid]), 4, &rowLen);
@@ -267,6 +267,7 @@ void genOutput(SQLParser& sp, int* joinOrder, JoinAgent& ja) {
 			}
 		}
 	}
+	delete rowContent;
 }
 
 set <int> filter(Table& t, const set <Cond>& FCond) {
