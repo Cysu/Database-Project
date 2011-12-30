@@ -1,6 +1,2 @@
-5
-INSERT INTO item VALUES (6,'abc',123,'abcde'),(7,'da',32,'123');
-SELECT i_name, i_data FROM item, _order, order_line WHERE i_id = o_id AND i_name = 'apple' AND ol_o_id = o_ol_cnt;
-SELECT i_name, c_phone, c_last FROM item, customer WHERE i_name = c_first;
-INSERT INTO _order VALUES (3,12,12,'meat'),(4,13,13,'wine');
-INSERT INTO _order VALUES (5,12,11,'meat');
+1
+SELECT b_1, a_1 FROM B, A WHERE b_0 = a_0 AND b_1 = 'v' AND a_0 = 5

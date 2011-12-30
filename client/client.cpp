@@ -126,10 +126,10 @@ void execute(const string& sql)
 	SQLParser sp(sql);
 
 	initJoinGraph(sp);
-	if (joinOrder != NULL)
-		delete joinOrder;
-	joinOrder = new int[JConds.size()*4];
+	joinOrder = new int[JConds.size()*4];	// delete at the end of next()
 	genJoinOrder(sp, joinOrder);
+	for (int i = 0; i < JConds.size(); i += 4)
+		printf("%d %d %d %d\n", joinOrder[i], joinOrder[i + 1], joinOrder[i + 2], joinOrder[i + 3]);
 
 	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
 	set<int> f = filter(tables[joinOrder[0]], mttFCond[joinOrder[0]]);
@@ -151,6 +151,7 @@ int next(char *row)
 			for (int i = 0; i < jaRet.size(); i++)
 				delete jaRet[i];
 			jaRet.clear();
+			delete joinOrder;
 			return (0);
 		} else
 			genOutput(outputRowNum + 1, BLOCK_SIZE);

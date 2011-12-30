@@ -1,6 +1,3 @@
-2
-SELECT i_name, c_phone FROM item, customer WHERE i_name = c_first;
-50.0
-SELECT i_name, i_data FROM item, _order, order_line WHERE i_id = o_id AND i_name = 'apple' AND ol_o_id = o_ol_cnt;
-50.0
-
+1
+SELECT b_1, a_1 FROM B, A WHERE b_0 = a_0 AND b_1 = 'v' AND a_0 = 13
+100.0

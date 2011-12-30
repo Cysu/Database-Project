@@ -45,12 +45,10 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 				tables[tIdB].columns[cIdB].filterBy(t, EQU, matchRows);
 			} else {
 				string t = rowContent + colOffset;
-				cout << t << endl;
 				tables[tIdB].columns[cIdB].filterBy(t, matchRows);
 			}
 		}
 		addTo(newRet, j, i, matchRows, filterRet);
-		output(newRet);
 	}
 	delete rowContent;
 
