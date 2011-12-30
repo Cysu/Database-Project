@@ -1,41 +1,26 @@
+3
+student_inf
+4
+student_id_t1 INTEGER
+student_name_t1 VARCHAR(15)
+student_age_t1 INTEGER
+student_hobby_t1 VARCHAR(40)
+1
+student_id_t1
+student_course
 5
-A
-5
-a_0		INTEGER
-a_1		VARCHAR(256)
-a_2		INTEGER
-a_3		VARCHAR(256)
-a_4		INTEGER
-0
-B
-5
-b_0		INTEGER
-b_1		VARCHAR(256)
-b_2		INTEGER
-b_3		VARCHAR(256)
-b_4		INTEGER
-0
-C
-5
-c_0		INTEGER
-c_1		VARCHAR(256)
-c_2		INTEGER
-c_3		VARCHAR(256)
-c_4		INTEGER
-0
-D
-5
-d_0		INTEGER
-d_1		VARCHAR(256)
-d_2		INTEGER
-d_3		VARCHAR(256)
-d_4		INTEGER
-0
-E
-5
-e_0		INTEGER
-e_1		VARCHAR(256)
-e_2		INTEGER
-e_3		VARCHAR(256)
-e_4		INTEGER
-0
+student_id_t2 INTEGER
+course_name_t2 VARCHAR(12)
+student_score_t2 INTEGER
+student_value_t2 VARCHAR(15)
+student_name_t2 VARCHAR(15)
+2
+student_id_t2
+course_name_t2
+course_teacher
+3
+course_name_t3 VARCHAR(12)
+course_teacher_t3 VARCHAR(18)
+course_location_t3 VARCHAR(8)
+1
+course_name_t3

@@ -33,6 +33,10 @@ void Table::load(const vector<string>& initRows) {
 	for (int i = 0; i < initRows.size(); i ++) {
 		row = parse(initRows[i], i);
 		rows->set((byte*) &i, 4, row, rowLen);
+		if (name == "C") {
+			size_t len;
+			byte* buf = rows->get((byte*) &i, 4, &len);
+		}
 	}
 	delete row;
 }
@@ -57,7 +61,7 @@ byte* Table::parse(const string& s, int rowNum) {
 		if (columns[i].type == INT) {
 			unsigned int v;
 			sscanf(buf, "%u", &v);
-			*(ret + columns[i].offset) = v;
+			*((unsigned int*)(ret + columns[i].offset)) = v;
 			// insertIndex
 			if (columns[i].needIndex)
 				columns[i].insertIndex(v, rowNum);

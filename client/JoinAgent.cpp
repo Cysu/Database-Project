@@ -41,7 +41,7 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 			int colOffset = tables[tIdA].columns[cIdA].offset;
 			int colLen = tables[tIdA].columns[cIdA].len;
 			if (tables[tIdA].columns[cIdA].type == INT) {
-				unsigned int t = *(rowContent + colOffset);
+				unsigned int t = *((unsigned int*)(rowContent + colOffset));
 				tables[tIdB].columns[cIdB].filterBy(t, EQU, matchRows);
 			} else {
 				string t = rowContent + colOffset;
@@ -80,7 +80,7 @@ void JoinAgent::addTo(vector<int*>& newRet, int j, int i, const vector<int>& mat
 	for (int k = 0; k < matchRows.size(); k ++) {
 		if (filterRet.find(matchRows[k]) != filterRet.end()) {
 			int* joinRetItem = new int[n];
-			memcpy(joinRetItem, ret[j], sizeof(joinRetItem));
+			memcpy(joinRetItem, ret[j], n * 4);
 			joinRetItem[i + 1] = matchRows[k];
 			newRet.push_back(joinRetItem);
 		}

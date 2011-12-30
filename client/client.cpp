@@ -129,6 +129,10 @@ void execute(const string& sql)
 	joinOrder = new int[JConds.size()*4];	// delete at the end of next()
 	genJoinOrder(sp, joinOrder);
 
+	for (int i = 0; i < JConds.size(); i ++) {
+		printf("%d %d %d %d\n", joinOrder[i*4], joinOrder[i*4+1], joinOrder[i*4+2], joinOrder[i*4+3]);
+	}
+
 	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
 	set<int> f;
 	if (JConds.size() > 0) {
@@ -138,26 +142,27 @@ void execute(const string& sql)
 	}
 
 	ja.init(f);
-//	ja.output(ja.ret);
+	//ja.output(ja.ret);
 	for (int i = 0; i < JConds.size(); i ++) {
 		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
 		ja.join(i, f);
 	}
 	jaRet = ja.ret;	
-	ja.output(ja.ret);
+	//ja.output(ja.ret);
+	cout << ja.ret.size() << endl;
+
 	if (JConds.size() <= 0) {
 		joinOrder = new int[1];
 		joinOrder[0] = tableId[sp.tables[0]];
 	}
 	outputRowNum = 0;
-	cout << "ok" << endl;
-	genOutput(0, BLOCK_SIZE);
+	//genOutput(0, BLOCK_SIZE);
 }
 
 
 int next(char *row)
 {
-	if (result.size() == 0){
+	if (result.size() <= 0){
 		if (outputRowNum == jaRet.size()) {
 			for (int i = 0; i < jaRet.size(); i++)
 				delete jaRet[i];
@@ -165,12 +170,12 @@ int next(char *row)
 			delete joinOrder;
 			return (0);
 		} else
-			genOutput(outputRowNum + 1, BLOCK_SIZE);
+			genOutput(outputRowNum, BLOCK_SIZE);
 	}
 	strcpy(row, result.back().c_str());
 	result.pop_back();
+	//cout << outputRowNum << endl;
 	outputRowNum++;
-	printf("%s\n", row);
 
 	return (1);
 }
@@ -306,7 +311,7 @@ void genOutput(int start, int len) {
 			if (joinOrder[0] == i)
 				pos = 0;
 			else {
-				for (pos = 1; pos < sizeof(joinOrder) / 4; pos++)
+				for (pos = 1; pos < JConds.size(); pos++)
 					if (joinOrder[pos * 4 - 2] == i)
 						break;
 			}
@@ -316,7 +321,7 @@ void genOutput(int start, int len) {
 				int colOffset = tables[i].columns[cids[k]].offset;
 				int colLen = tables[i].columns[cids[k]].len;
 				if (tables[i].columns[cids[k]].type == INT) {
-					unsigned int t = *(rowContent + colOffset);
+					unsigned int t = *((unsigned int*)(rowContent + colOffset));
 					char buf[20];
 					sprintf(buf, "%u", t);
 					t_result[j][positions[k]] = string(buf);
@@ -338,7 +343,7 @@ void genOutput(int start, int len) {
 			result[j] += t_result.back()[k] + ",";
 		}
 		result[j] += t_result.back()[t_result.back().size() - 1];
-		t_result.pop_back();	
+		t_result.pop_back();
 	}		
 	/*
 	for (int i = 0; i < sp.output.size(); i++) {
