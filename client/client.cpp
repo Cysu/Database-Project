@@ -22,7 +22,7 @@ map<string, int> tableId;
 map<string, pair<int, int> > columnId;
 vector<string> result;
 
-set <int> filter(Table& t, const set <Cond>& FCond); 
+int filter(Table& t, const set <Cond>& FCond); 
 void getJoinOrder(int*);
 
 //maps table id to the col ids that used for join or project
@@ -49,6 +49,8 @@ int* joinOrder;
 
 //internal result
 vector <int*> jaRet;
+
+set<int> s[2];
 
 void initJoinGraph(SQLParser& sp);
 void genJoinOrder(SQLParser& sp, int* joinOrder);
@@ -109,7 +111,7 @@ void execute(const string& sql)
 
 
 	result.clear();
-	cout << sql << endl;
+	//cout << sql << endl;
 	if (strstr(sql.c_str(), "INSERT") != NULL) {
 		tokenize(sql.c_str(), token);
 		i += 2;//skip INSERT INTO
@@ -129,27 +131,28 @@ void execute(const string& sql)
 	joinOrder = new int[JConds.size()*4];	// delete at the end of next()
 	genJoinOrder(sp, joinOrder);
 
-	for (int i = 0; i < JConds.size(); i ++) {
+	/*for (int i = 0; i < JConds.size(); i ++) {
 		printf("%d %d %d %d\n", joinOrder[i*4], joinOrder[i*4+1], joinOrder[i*4+2], joinOrder[i*4+3]);
-	}
+	}*/
 
+	int f;
 	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
-	set<int> f;
 	if (JConds.size() > 0) {
 		f = filter(tables[joinOrder[0]], mttFCond[joinOrder[0]]);
 	} else {
 		f = filter(tables[tableId[sp.tables[0]]], mttFCond[tableId[sp.tables[0]]]);
 	}
 
-	ja.init(f);
+	ja.init(s[f]);
+	//cout << ja.ret.size() << endl;
 	//ja.output(ja.ret);
 	for (int i = 0; i < JConds.size(); i ++) {
 		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
-		ja.join(i, f);
+		ja.join(i, s[f]);
 	}
 	jaRet = ja.ret;	
 	//ja.output(ja.ret);
-	cout << ja.ret.size() << endl;
+	//cout << ja.ret.size() << endl;
 
 	if (JConds.size() <= 0) {
 		joinOrder = new int[1];
@@ -173,8 +176,8 @@ int next(char *row)
 			genOutput(outputRowNum, BLOCK_SIZE);
 	}
 	strcpy(row, result.back().c_str());
+	//printf("%s\n", row);
 	result.pop_back();
-	//cout << outputRowNum << endl;
 	outputRowNum++;
 
 	return (1);
@@ -375,10 +378,11 @@ void genOutput(int start, int len) {
 	*/
 }
 
-set <int> filter(Table& t, const set <Cond>& FCond) {
+int filter(Table& t, const set <Cond>& FCond) {
 	bool found = false;
-	set <int> s[2];
-	vector <int> temp;
+	s[0].clear();
+	s[1].clear();
+	vector<int> temp;
 	int p = 0;
 	for (set <Cond>::iterator it = FCond.begin(); it != FCond.end(); it++) {
 		int tid = columnId[it->colName].first;
@@ -402,17 +406,18 @@ set <int> filter(Table& t, const set <Cond>& FCond) {
 				}
 				break;
 		}	
-		s[(p+1)&1].clear();
+		s[p^1].clear();
 		for (int i = 0; i < temp.size(); i++) {
 			if (!found || s[p].find(temp[i]) != s[p].end())
-				s[(p+1)&1].insert(temp[i]);
+				s[p^1].insert(temp[i]);
 		}
 		found = true;
-		p = (p+1)&1;
+		p ^= 1;
 	}
 	if (!found) {
 		for (int i = 0; i < t.rows->count(); i++)
 			s[p].insert(i);
 	}
-	return s[p];
+	return p;
 }	
+

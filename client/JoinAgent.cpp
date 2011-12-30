@@ -31,6 +31,7 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 
 	byte* rowContent = NULL;
 	vector<int> matchRows;
+	//cout << ret.size() << endl;
 	for (int j = 0; j < ret.size(); j ++) {
 		if (j == 0 || ret[j][i] != ret[j-1][i]) {
 			// find in index
@@ -40,14 +41,20 @@ void JoinAgent::join(int i, const set<int>& filterRet) {
 			rowContent = tables[tIdA].rows->get((byte*) &(ret[j][i]), 4, &rowLen);
 			int colOffset = tables[tIdA].columns[cIdA].offset;
 			int colLen = tables[tIdA].columns[cIdA].len;
+			// debug
+			//printf("table %d, row %d, col %d, value ", tIdA, ret[j][i], cIdA);
 			if (tables[tIdA].columns[cIdA].type == INT) {
 				unsigned int t = *((unsigned int*)(rowContent + colOffset));
 				tables[tIdB].columns[cIdB].filterBy(t, EQU, matchRows);
+			//	cout << t << endl;
 			} else {
 				string t = rowContent + colOffset;
 				tables[tIdB].columns[cIdB].filterBy(t, matchRows);
+			//	cout << t << endl;
 			}
+
 		}
+		//cout << "matches " << matchRows.size() << endl;
 		addTo(newRet, j, i, matchRows, filterRet);
 	}
 	delete rowContent;

@@ -26,17 +26,14 @@ Table::Table(const string& name, const vector<string>& columnName,
 
 void Table::load(const vector<string>& initRows) {
 	for (int i = 0; i < columns.size(); i ++)
-		if (columns[i].needIndex)
+		if (columns[i].needIndex && !columns[i].hasIndex)
 			columns[i].initIndex();
 
 	byte* row = NULL;
 	for (int i = 0; i < initRows.size(); i ++) {
-		row = parse(initRows[i], i);
-		rows->set((byte*) &i, 4, row, rowLen);
-		if (name == "C") {
-			size_t len;
-			byte* buf = rows->get((byte*) &i, 4, &len);
-		}
+		int rowNum = rows->count();
+		row = parse(initRows[i], rowNum);
+		rows->set((byte*) &rowNum, 4, row, rowLen);
 	}
 	delete row;
 }

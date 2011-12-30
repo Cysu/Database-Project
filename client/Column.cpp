@@ -12,11 +12,13 @@ Column::Column(const string& name, const string& type) {
 	}
 	index = NULL;
 	needIndex = false;
+	hasIndex = false;
 }
 
 void Column::initIndex() {
 	index = new TreeDB();
 	index->open(("data/" + name + ".kch").c_str(), TreeDB::OWRITER | TreeDB:: OCREATE);
+	hasIndex = true;
 }
 
 void Column::insertIndex(unsigned int key, int rowNum) {

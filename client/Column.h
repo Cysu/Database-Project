@@ -17,7 +17,7 @@ public:
 	int len;	// length of string(+1 for '\0')
 	int offset;	// offset in a row(in bytes)
 	TreeDB* index;
-	bool needIndex;
+	bool needIndex, hasIndex;
 
 	Column(const string& name, const string& type);
 	void initIndex();
