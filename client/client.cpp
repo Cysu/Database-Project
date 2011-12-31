@@ -6,6 +6,7 @@
 #include <cassert>
 #include <iostream>
 #include <utility>
+#include <ext/hash_set>
 
 #include "../include/client.h"
 #include "../lib/tokenize.h"
@@ -13,9 +14,10 @@
 #include "Table.h"
 #include "sqlparser.h"
 #include "cond.h"
-#include "JoinAgent.h"
+#include "JoinAgent.h";
 
 using namespace std;
+using namespace __gnu_cxx;
 
 vector<Table> tables;
 map<string, int> tableId;
@@ -50,7 +52,7 @@ int* joinOrder;
 //internal result
 vector <int*> jaRet;
 
-set<int> s[2];
+hash_set<int> s[2];
 
 void initJoinGraph(SQLParser& sp);
 void genJoinOrder(SQLParser& sp, int* joinOrder);
@@ -176,7 +178,7 @@ int next(char *row)
 			genOutput(outputRowNum, BLOCK_SIZE);
 	}
 	strcpy(row, result.back().c_str());
-	//printf("%s\n", row);
+//	printf("%s\n", row);
 	result.pop_back();
 	outputRowNum++;
 

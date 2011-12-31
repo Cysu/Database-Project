@@ -12,7 +12,7 @@ class Table {
 public:
 	string name;
 	vector<Column> columns;
-	HashDB* rows;
+	TreeDB* rows;
 	vector<int> primary;
 
 	Table(const string& name, const vector<string>& columnName,

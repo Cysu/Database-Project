@@ -15,8 +15,8 @@ Table::Table(const string& name, const vector<string>& columnName,
 	}
 
 	// make rows
-	rows = new HashDB();
-	rows->open(("data/" + name + ".kch").c_str(), HashDB::OWRITER | HashDB::OCREATE);
+	rows = new TreeDB();
+	rows->open(("data/" + name + ".kct").c_str(), TreeDB::OWRITER | TreeDB::OCREATE | TreeDB::ONOLOCK);
 	rowLen = 0;
 	for (int i = 0; i < columns.size(); i ++) {
 		columns[i].offset = rowLen;

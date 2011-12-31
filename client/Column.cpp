@@ -17,7 +17,7 @@ Column::Column(const string& name, const string& type) {
 
 void Column::initIndex() {
 	index = new TreeDB();
-	index->open(("data/" + name + ".kch").c_str(), TreeDB::OWRITER | TreeDB:: OCREATE);
+	index->open(("data/" + name + ".kct").c_str(), TreeDB::OWRITER | TreeDB:: OCREATE | TreeDB::ONOLOCK);
 	hasIndex = true;
 }
 

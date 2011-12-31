@@ -10,15 +10,15 @@ JoinAgent::JoinAgent(
 	this->order = order;
 }
 
-void JoinAgent::init(const set<int>& filterRet) {
-	for (set<int>::iterator iter = filterRet.begin(); iter != filterRet.end(); iter ++) {
+void JoinAgent::init(const hash_set<int>& filterRet) {
+	for (hash_set<int>::iterator iter = filterRet.begin(); iter != filterRet.end(); iter ++) {
 		int* joinRetItem = new int[n];
 		joinRetItem[0] = *iter;
 		ret.push_back(joinRetItem);
 	}
 }
 
-void JoinAgent::join(int i, const set<int>& filterRet) {
+void JoinAgent::join(int i, const hash_set<int>& filterRet) {
 	int tIdA = order[i * 4];
 	int cIdA = order[i * 4 + 1];
 	int tIdB = order[i * 4 + 2];
@@ -83,7 +83,7 @@ void JoinAgent::sort(int t, int l, int r) {
 	if (l < j) sort(t, l, j);
 }
 	
-void JoinAgent::addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const set<int>& filterRet) {
+void JoinAgent::addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const hash_set<int>& filterRet) {
 	for (int k = 0; k < matchRows.size(); k ++) {
 		if (filterRet.find(matchRows[k]) != filterRet.end()) {
 			int* joinRetItem = new int[n];
