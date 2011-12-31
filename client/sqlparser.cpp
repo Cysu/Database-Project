@@ -18,9 +18,9 @@ SQLParser::SQLParser(const string& sql) {
 	for(i++; i < token.size(); i++) {
 		if (token[i] == ",")
 			continue;
-		tables.push_back(token[i]);
 		if (token[i] == "WHERE" || token[i] == ";")
 			break;
+		tables.push_back(token[i]);
 	}
 
 	join.clear();

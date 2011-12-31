@@ -6,7 +6,6 @@
 #include <cassert>
 #include <iostream>
 #include <utility>
-#include <ext/hash_set>
 
 #include "../include/client.h"
 #include "../lib/tokenize.h"
@@ -14,7 +13,7 @@
 #include "Table.h"
 #include "sqlparser.h"
 #include "cond.h"
-#include "JoinAgent.h";
+#include "JoinAgent.h"
 
 using namespace std;
 using namespace __gnu_cxx;
@@ -110,8 +109,6 @@ void execute(const string& sql)
 	vector<string> token, table, row;
 	map<string, int> m;
 	int i;
-
-
 	result.clear();
 	//cout << sql << endl;
 	if (strstr(sql.c_str(), "INSERT") != NULL) {
@@ -127,8 +124,11 @@ void execute(const string& sql)
 	}
 
 	//SELECT
+	//cout << "querying... " << sql << endl;
 	SQLParser sp(sql);
-
+	//cout << "SQLParser ok" << endl;
+	//cout << "join number:" << sp.join.size() << endl;
+	//cout << "table number:" << sp.tables.size() << endl;
 	initJoinGraph(sp);
 	joinOrder = new int[JConds.size()*4];	// delete at the end of next()
 	genJoinOrder(sp, joinOrder);
@@ -145,11 +145,13 @@ void execute(const string& sql)
 		f = filter(tables[tableId[sp.tables[0]]], mttFCond[tableId[sp.tables[0]]]);
 	}
 
+	//cout << s[f].size() << endl;
+
 	ja.init(s[f]);
-	//cout << ja.ret.size() << endl;
 	//ja.output(ja.ret);
 	for (int i = 0; i < JConds.size(); i ++) {
 		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
+	//	cout << "internal Result size:" << ja.ret.size() << " next table size:" << s[f].size() << endl;
 		ja.join(i, s[f]);
 	}
 	jaRet = ja.ret;	
@@ -167,8 +169,8 @@ void execute(const string& sql)
 
 int next(char *row)
 {
-	if (result.size() <= 0){
-		if (outputRowNum == jaRet.size()) {
+	if (result.size() <= 0 /*|| outputRowNum > 1*/){
+		if (outputRowNum == jaRet.size() /*|| outputRowNum > 1*/) {
 			for (int i = 0; i < jaRet.size(); i++)
 				delete jaRet[i];
 			jaRet.clear();
@@ -197,16 +199,18 @@ void initJoinGraph(SQLParser& sp) {
 	mttcsProj.clear();
 	JConds.clear();
 	outputCols.clear();
-
+	//cout << "start" << endl;
 	for (int i = 0; i < tables.size(); i++) {
 		mttRowNum[i] = tables[i].rows->count();
 	}	
+	//cout << "init mttRowNum" << endl;
 	for (int i = 0; i < sp.output.size(); i++) {
 		int tid = columnId[sp.output[i]].first;
 		int cid = columnId[sp.output[i]].second;
 		mttcsProj[tid].insert(cid);
 		outputCols.push_back(make_pair(tid, cid));	
 	}
+	//cout << "project cols ok" << endl;
 	for (int i = 0; i < sp.join.size(); i++) {
 		int tid = columnId[sp.join[i].colA].first;
 		int cid = columnId[sp.join[i].colA].second;
@@ -220,28 +224,38 @@ void initJoinGraph(SQLParser& sp) {
 		JConds.insert(sp.join[i]);
 		
 	}
+	//cout << "join cols ok" << endl;
+	//cout << JConds.size() << endl;
 	for (int i = 0; i < sp.filter.size(); i++) {
 		int tid = columnId[sp.filter[i].colName].first;
 		int cid = columnId[sp.filter[i].colName].second;
 		mttFCond[tid].insert(sp.filter[i]);	
 		mttRowNum[tid] = mttRowNum[tid]/tables[tid].columns[cid].index->count();
 	}
+	//cout << "filter cols ok" << endl;
 	for (int i = 0; i < sp.range.size(); i++) {
 		int tid = columnId[sp.range[i].colName].first;
 		mttFCond[tid].insert(sp.range[i]);	
 		mttRowNum[tid] = mttRowNum[tid]/3;
 	}
+	//cout << "range cols ok" << endl;
 }
 
 void genJoinOrder(SQLParser&sp, int* joinOrder) {
+	//cout << "gen join oreder" << endl;
 	int* q = joinOrder;
 	int min = 2147483647;
 	int curTable;
-	for (int i = 0; i < sp.tables.size(); i++)
+	for (int i = 0; i < sp.tables.size(); i++) {
+		//cout << sp.tables[i] << endl;
 		if (mttRowNum[tableId[sp.tables[i]]] < min) {
+			//cout << "tableId:" << tableId[sp.tables[i]] << endl;
+			//cout << "numOfRows:" << mttRowNum[tableId[sp.tables[i]]] << endl;
 			min = mttRowNum[tableId[sp.tables[i]]];
 			curTable = tableId[sp.tables[i]];
+			//cout << "curTable:" << curTable << endl;
 		}
+	}
 	set <Cond> curConds, oldConds;	
 	set <int> oldTable;
 	while (q - joinOrder < JConds.size()*4) {
@@ -251,8 +265,10 @@ void genJoinOrder(SQLParser&sp, int* joinOrder) {
 		for (set <int>::iterator it = mttcsJoin[curTable].begin(); it != mttcsJoin[curTable].end(); it++) {
 			set <Cond> t = mctCondJoin[make_pair(curTable, (*it))];
 			for (set <Cond>::iterator jt = t.begin(); jt != t.end(); jt++)
-				if (oldConds.find((*jt)) == oldConds.end())
+				if (oldConds.find((*jt)) == oldConds.end()) {
 					curConds.insert((*jt));
+					//cout << "a:" << jt->colA << ",b:" << jt->colB << endl;
+				}
 		}			
 		Cond toJoin;
 		min = 2147483647;
@@ -289,10 +305,12 @@ void genJoinOrder(SQLParser&sp, int* joinOrder) {
 
 void genOutput(int start, int len) {
 	byte* rowContent = NULL;
-	vector <vector <string> > t_result;
+	int resLen = jaRet.size() - start < len ? jaRet.size() - start : len;
+	vector <vector <string> > t_result(resLen);
 	result.clear();
-	for (int i = start; i < jaRet.size() && i < start + len; i++)
-		t_result.push_back(vector <string>(outputCols.size()));
+	result.resize(resLen, string());
+	for (int i = 0; i < resLen; i++)
+		t_result[i].resize(outputCols.size(), string());	
 	//for each tables
 	for (int i = 0; i < tables.size(); i++) {
 		vector <int> cids, positions;
@@ -308,19 +326,22 @@ void genOutput(int start, int len) {
 		}	
 		//read all the data in cols indicated by cids and store them it t_result cols indicated by positions
 		//read at most len rows
+		//find the col num in jaRet that store the rowId of table i
+		int pos;
+		if (joinOrder[0] == i)
+			pos = 0;
+		else {
+			for (pos = 1; pos < JConds.size(); pos++)
+				if (joinOrder[pos * 4 - 2] == i)
+					break;
+		}
+		//JoinAgent::sort(jaRet, pos, 0, jaRet.size() - 1);	
 		for (int jj = start; jj < jaRet.size() && jj < start + len; jj++) {
 			int j = jj - start;
 			size_t rowLen;
-			//find the col num in jaRet that store the rowId of table i
-			int pos;
-			if (joinOrder[0] == i)
-				pos = 0;
-			else {
-				for (pos = 1; pos < JConds.size(); pos++)
-					if (joinOrder[pos * 4 - 2] == i)
-						break;
-			}
-			rowContent = tables[i].rows->get((byte*)&(jaRet[jj][pos]), 4, &rowLen);
+			byte kBuf[4];
+			getBigNotation(jaRet[jj][pos], kBuf);
+			rowContent = tables[i].rows->get(kBuf, 4, &rowLen);
 			//get the data...
 			for (int k = 0; k < cids.size(); k++) {
 				int colOffset = tables[i].columns[cids[k]].offset;
@@ -340,15 +361,14 @@ void genOutput(int start, int len) {
 		}
 		
 	}	
+	
 	//put t_result int result...
 	for (int jj = start; jj < jaRet.size() && jj < start + len; jj++) {
 		int j = jj - start;
-		result.push_back(string());
-		for (int k = 0; k < t_result.back().size() - 1; k++) {
-			result[j] += t_result.back()[k] + ",";
+		for (int k = 0; k < outputCols.size() - 1; k++) {
+			result[j] += t_result[j][k] + ",";
 		}
-		result[j] += t_result.back()[t_result.back().size() - 1];
-		t_result.pop_back();
+		result[j] += t_result[j][outputCols.size() - 1];
 	}		
 	/*
 	for (int i = 0; i < sp.output.size(); i++) {

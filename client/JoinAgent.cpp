@@ -25,7 +25,7 @@ void JoinAgent::join(int i, const hash_set<int>& filterRet) {
 	int cIdB = order[i * 4 + 3];
 
 	// sort
-	sort(i, 0, ret.size() - 1);
+	sort(ret, i, 0, ret.size() - 1);
 
 	vector<int*> newRet;
 
@@ -38,7 +38,9 @@ void JoinAgent::join(int i, const hash_set<int>& filterRet) {
 			size_t rowLen;
 			int tmp = 0;
 			matchRows.clear();
-			rowContent = tables[tIdA].rows->get((byte*) &(ret[j][i]), 4, &rowLen);
+			byte kBuf[4];
+			getBigNotation(ret[j][i], kBuf);
+			rowContent = tables[tIdA].rows->get(kBuf, 4, &rowLen);
 			int colOffset = tables[tIdA].columns[cIdA].offset;
 			int colLen = tables[tIdA].columns[cIdA].len;
 			// debug
@@ -65,7 +67,7 @@ void JoinAgent::join(int i, const hash_set<int>& filterRet) {
 	ret = newRet;
 }
 
-void JoinAgent::sort(int t, int l, int r) {
+void JoinAgent::sort(vector<int*>& ret, int t, int l, int r) {
 	if (l >= r) return;
 	int i = l, j = r, x = ret[(l + r) >> 1][t];
 	while (i <= j) {
@@ -79,8 +81,8 @@ void JoinAgent::sort(int t, int l, int r) {
 			j --;
 		}
 	}
-	if (i < r) sort(t, i, r);
-	if (l < j) sort(t, l, j);
+	if (i < r) sort(ret, t, i, r);
+	if (l < j) sort(ret, t, l, j);
 }
 	
 void JoinAgent::addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const hash_set<int>& filterRet) {

@@ -12,7 +12,7 @@ class Table {
 public:
 	string name;
 	vector<Column> columns;
-	TreeDB* rows;
+	HashDB* rows;
 	vector<int> primary;
 
 	Table(const string& name, const vector<string>& columnName,
@@ -23,7 +23,7 @@ public:
 
 private:
 	int rowLen;	// length of each row(in bytes)
-	byte* parse(const string& s, int rowNum);
+	byte* parse(const string& s, vector<vector<pair<int, string> > >& parseRet);
 };
 
 

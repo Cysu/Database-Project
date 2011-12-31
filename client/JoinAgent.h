@@ -9,8 +9,6 @@
 #include <ext/hash_set>
 #include <utility>
 
-
-
 using namespace std;
 using namespace __gnu_cxx;
 
@@ -33,7 +31,7 @@ public:
 
 	void output(const vector<int*>& ret);
 
-	void sort(int t, int l, int r);
+	static void sort(vector<int*>& ret, int t, int l, int r);
 private:
 	void addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const hash_set<int>& filterRet);
 };
