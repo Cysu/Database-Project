@@ -1,26 +1,83 @@
-3
-student_inf
-4
-student_id_t1 INTEGER
-student_name_t1 VARCHAR(15)
-student_age_t1 INTEGER
-student_hobby_t1 VARCHAR(40)
+6
+customer
+21
+c_id INTEGER
+c_d_id INTEGER
+c_w_id INTEGER
+c_first VARCHAR(64)
+c_middle VARCHAR(64)
+c_last VARCHAR(64)
+c_street_1 VARCHAR(64)
+c_street_2 VARCHAR(64)
+c_city VARCHAR(64)
+c_state VARCHAR(64)
+c_zip VARCHAR(64)
+c_phone VARCHAR(64)
+c_since VARCHAR(64)
+c_credit VARCHAR(64)
+c_credit_lim INTEGER
+c_discount INTEGER
+c_balance INTEGER
+c_ytd_payment INTEGER
+c_payment_cnt INTEGER
+c_delivery_cnt INTEGER
+c_data VARCHAR(512)
 1
-student_id_t1
-student_course
+c_id
+history
+8
+h_c_id INTEGER
+h_c_d_id INTEGER
+h_c_w_id INTEGER
+h_d_id INTEGER
+h_w_id INTEGER
+h_date VARCHAR(64)
+h_amount INTEGER
+h_data VARCHAR(64)
+1
+h_c_id
+item
 5
-student_id_t2 INTEGER
-course_name_t2 VARCHAR(12)
-student_score_t2 INTEGER
-student_value_t2 VARCHAR(15)
-student_name_t2 VARCHAR(15)
-2
-student_id_t2
-course_name_t2
-course_teacher
-3
-course_name_t3 VARCHAR(12)
-course_teacher_t3 VARCHAR(18)
-course_location_t3 VARCHAR(8)
+i_id INTEGER
+i_im_id INTEGER
+i_name VARCHAR(64)
+i_price INTEGER
+i_data VARCHAR(64)
 1
-course_name_t3
+i_id
+new_orders
+3
+no_o_id INTEGER
+no_d_id INTEGER
+no_w_id INTEGER
+1
+no_o_id
+order_line
+10
+ol_o_id INTEGER
+ol_d_id INTEGER
+ol_w_id INTEGER
+ol_number INTEGER
+ol_i_id INTEGER
+ol_supply_w_id INTEGER
+ol_delivery_d VARCHAR(64)
+ol_quantity INTEGER
+ol_amount INTEGER
+ol_dist_info VARCHAR(64)
+1
+ol_o_id
+district
+11
+d_id INTEGER 
+d_w_id INTEGER
+d_name VARCHAR(64)
+d_street_1 VARCHAR(64)
+d_street_2 VARCHAR(64)
+d_city VARCHAR(64)
+d_state VARCHAR(64)
+d_zip VARCHAR(20)
+d_tax VARCHAR(64)
+d_ytd VARCHAR(64)
+d_next_o_id INTEGER
+1
+d_id

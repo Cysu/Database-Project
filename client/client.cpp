@@ -303,11 +303,10 @@ void genJoinOrder(SQLParser&sp, int* joinOrder) {
 	}
 }
 
+vector <vector <string> > t_result(BLOCK_SIZE);
 void genOutput(int start, int len) {
 	byte* rowContent = NULL;
 	int resLen = jaRet.size() - start < len ? jaRet.size() - start : len;
-	vector <vector <string> > t_result(resLen);
-	result.clear();
 	result.resize(resLen, string());
 	for (int i = 0; i < resLen; i++)
 		t_result[i].resize(outputCols.size(), string());	
