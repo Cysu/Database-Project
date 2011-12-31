@@ -1,0 +1,16 @@
+14
+SELECT student_id_t1, student_id_t2, student_name_t1 FROM student_inf, student_course WHERE student_id_t1 = student_id_t2; 
+SELECT student_name_t1, student_score_t2 FROM student_inf, student_course WHERE student_id_t1 = student_id_t2 AND student_score_t2 < 60;
+SELECT student_name_t1, student_name_t2,course_name_t2 FROM student_inf, student_course WHERE student_id_t1 = student_id_t2 AND course_name_t2 = 'Biology';  
+SELECT student_id_t1, student_name_t2, course_teacher_t3 FROM student_inf, student_course, course_teacher WHERE student_id_t1 = student_id_t2 AND course_name_t2 = course_name_t3;  
+SELECT student_name_t1, student_name_t2, student_score_t2, course_teacher_t3 FROM student_inf, student_course, course_teacher WHERE student_id_t1 = student_id_t2 AND course_name_t2 = course_name_t3 AND student_score_t2 = 100;  
+SELECT course_teacher_t3, course_name_t3, student_name_t2, course_teacher_t3 FROM student_course, course_teacher WHERE course_name_t2 = course_name_t3 AND course_teacher_t3 = 'ZhengZhongxiang';
+SELECT student_name_t1, student_score_t2, student_age_t1, student_hobby_t1 FROM student_inf, student_course WHERE student_hobby_t1 = 'eating' AND student_id_t1 = student_id_t2 AND student_score_t2 > 90 AND student_age_t1 > 20;
+SELECT student_id_t1, student_id_t2, student_name_t1, student_name_t2, student_age_t1, student_score_t2, student_hobby_t1 FROM student_inf, student_course WHERE student_id_t1 = student_id_t2 AND student_score_t2 > 99 AND student_age_t1 > 20;
+SELECT student_name_t1, student_hobby_t1, student_age_t1 FROM student_inf WHERE student_hobby_t1 = 'football' AND student_id_t1 < 10;
+SELECT course_teacher_t3, course_name_t3, student_id_t2, student_name_t2, student_score_t2 FROM student_course, course_teacher WHERE course_name_t2 = course_name_t3 AND student_score_t2 > 85 AND student_score_t2 < 95 AND student_id_t2 > 10;
+SELECT student_id_t2, student_name_t2, student_score_t2, student_value_t2, course_name_t2 FROM student_course, course_teacher WHERE student_id_t2 > 11 AND student_value_t2 = 'excellent' AND course_name_t2 = 'Physics' AND course_name_t3 = 'Physics' AND course_name_t2 = course_name_t3;
+SELECT course_teacher_t3, course_name_t3, student_id_t2, student_name_t2, student_score_t2 FROM student_course, course_teacher WHERE course_name_t2 = course_name_t3 AND student_score_t2 > 85 AND student_score_t2 < 95 AND course_name_t3 = 'Physics' AND course_name_t3 = 'Chinese';
+SELECT student_id_t1, student_id_t2, student_name_t1, student_name_t2, student_age_t1, student_score_t2 FROM student_inf, student_course WHERE student_id_t1 = student_id_t2 AND student_score_t2 < 80 AND student_age_t1 > 70;
+SELECT student_id_t1, student_name_t2, student_age_t1, student_score_t2, student_value_t2, course_name_t3, course_teacher_t3, course_location_t3 FROM student_inf, student_course, course_teacher WHERE student_id_t1 = student_id_t2 AND course_name_t2 = course_name_t3 AND student_score_t2 < 85 AND student_score_t2 > 50 AND student_id_t1 < 8 AND student_id_t2 < 9 AND student_id_t2 < 7 AND student_age_t1=15 AND course_location_t3 ='6B401' AND course_teacher_t3 = 'HongYuyang' AND student_value_t2 = 'poor';  
+
