@@ -1,10 +1,10 @@
 #include "sqlparser.h"
-#include "../lib/tokenize.h"
+#include "lib_tokenize.h"
 #include <cstdio>
 
 SQLParser::SQLParser(const string& sql) {
 	
-	tokenize(sql.c_str(), token);
+	lib_tokenize(sql.c_str(), token);
 	int i;
 	output.clear();
 	for(i = 0; i < token.size(); i++) {

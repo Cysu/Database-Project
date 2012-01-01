@@ -8,8 +8,7 @@
 #include <utility>
 
 #include "../include/client.h"
-#include "../lib/tokenize.h"
-#include "../lib/split_csv.h"
+#include "lib_tokenize.h"
 #include "Table.h"
 #include "sqlparser.h"
 #include "cond.h"
@@ -112,7 +111,7 @@ void execute(const string& sql)
 	result.clear();
 	//cout << sql << endl;
 	if (strstr(sql.c_str(), "INSERT") != NULL) {
-		tokenize(sql.c_str(), token);
+		lib_tokenize(sql.c_str(), token);
 		i += 2;//skip INSERT INTO
 		Table& t = tables[tableId[token[i++]]];	
 		for (i++; i < token.size(); i++) {
