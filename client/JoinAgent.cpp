@@ -1,4 +1,5 @@
 #include "JoinAgent.h"
+#include "utils.h"
 
 JoinAgent::JoinAgent(
 		vector<Table>& tables,
@@ -23,10 +24,126 @@ void JoinAgent::join(int i, const hash_set<int>& filterRet) {
 	int cIdA = order[i * 4 + 1];
 	int tIdB = order[i * 4 + 2];
 	int cIdB = order[i * 4 + 3];
+	hash_set <int> distinct;
+	for (int j = 0; j < ret.size(); j++)
+		distinct.insert(ret[j][i]);
+	//int count = 1;
+	//for (int j = 0; j < ret.size()-1; j++)
+	//	if (ret[j][i] != ret[j + 1][i])
+	//		count++;
+	if (distinct.size()  < (tables[tIdA].columns[cIdA].index->count() + tables[tIdB].columns[cIdB].index->count()) / 3) {
+		//assume that access data table is 20 times slower than access index table
+		cout << "check" << endl;
+		checkJoin(i, filterRet);
+	} else {
+		cout << "index" << endl;
+		indexJoin(i, filterRet);
+	}
+	cout << "done" << endl;
+}
 
-	// sort
+void JoinAgent::indexJoin(int i, const hash_set<int>& filterRet) {
+	int tIdA = order[i * 4];
+	int cIdA = order[i * 4 + 1];
+	int tIdB = order[i * 4 + 2];
+	int cIdB = order[i * 4 + 3];
+	size_t size;	
+	//map from rIdA to rIdBs
+	map <int, vector <int> > a2bs;
+	if (tables[tIdA].columns[cIdA].type == INT) {
+       		byte* kBuf;
+		byte* vBufA;
+	       	byte* vBufB;
+		DB::Cursor* ca = tables[tIdA].columns[cIdA].index->cursor();
+		DB::Cursor* cb = tables[tIdB].columns[cIdB].index->cursor();
+		bool exist1 = ca->jump();
+		bool exist2 = cb->jump();
+		while (exist1 && exist2) {
+			size = 4;
+			unsigned int keyA, keyB;
+			kBuf = ca->get_key(&size, false);
+			keyA = getSmallNotation(kBuf);
+			kBuf = cb->get_key(&size, false);
+			keyB = getSmallNotation(kBuf);
+			//cout << "a:" << keyA;
+			//cout << "b:" << keyB << endl;
+			if (keyA < keyB) {
+				//cout << "a++" << endl;
+				exist1 = ca->step();
+			} else if (keyA > keyB) {
+				//cout << "b++" << endl;
+				exist2 = cb->step();
+			} else {
+				vBufB = cb->get_value(&size, false);
+				vector <int> rIdBs;
+				for (int i = 0; i < size; i+= 4) {	
+					int t = *((int*)(vBufB + i));
+					rIdBs.push_back(t);
+				}
+				delete vBufB;
+				vBufA = ca->get_value(&size, false);
+				for (int i = 0; i < size; i+= 4) {
+					int t = *((int*)(vBufA + i));
+					a2bs[t] = rIdBs;
+				}
+				exist1 = ca->step();
+				exist2 = cb->step();
+				delete vBufA;
+			}
+			delete kBuf;
+		}
+	} else {
+		string keyA, keyB;
+		byte* vBufA;
+		byte* vBufB;
+		DB::Cursor* ca = tables[tIdA].columns[cIdA].index->cursor();
+		DB::Cursor* cb = tables[tIdB].columns[cIdB].index->cursor();
+		bool exist1 = ca->jump();
+		bool exist2 = cb->jump();
+		while (exist1 && exist2) {
+			ca->get_key(&keyA, false);
+			cb->get_key(&keyB, false);
+			if (keyA < keyB)
+				exist1 = ca->step();
+			else if (keyA > keyB)
+				exist2 = cb->step();
+			else {
+				vBufB = cb->get_value(&size, false);
+				vector <int> rIdBs;
+				for (int i = 0; i < size; i+= 4) {	
+					int t = *((int*)(vBufB + i));
+					rIdBs.push_back(t);
+				}
+				vBufA = ca->get_value(&size, false);
+				for (int i = 0; i < size; i+= 4) {
+					int t = *((int*)(vBufA + i));
+					a2bs[t] = rIdBs;
+				}
+				exist1 = ca->step();
+				exist2 = cb->step();
+				delete vBufA;
+				delete vBufB;
+			}
+		}
+	}
+	vector <int*> newRet;
+	for (int j = 0; j < ret.size(); j++) {
+		addTo(newRet, j, i, a2bs[ret[j][i]], filterRet);
+	}
+	for (int j = 0; j < ret.size(); j++)
+		delete ret[j];
+	ret = newRet;
+		
+}
+
+void JoinAgent::checkJoin(int i, const hash_set<int>& filterRet) {
+	int tIdA = order[i * 4];
+	int cIdA = order[i * 4 + 1];
+	int tIdB = order[i * 4 + 2];
+	int cIdB = order[i * 4 + 3];
+
+	// sort move to join
 	sort(ret, i, 0, ret.size() - 1);
-
 	vector<int*> newRet;
 
 	byte* rowContent = NULL;
@@ -54,12 +171,12 @@ void JoinAgent::join(int i, const hash_set<int>& filterRet) {
 				tables[tIdB].columns[cIdB].filterBy(t, matchRows);
 			//	cout << t << endl;
 			}
+			delete rowContent;
 
 		}
 		//cout << "matches " << matchRows.size() << endl;
 		addTo(newRet, j, i, matchRows, filterRet);
 	}
-	delete rowContent;
 
 
 	for (int j = 0; j < ret.size(); j ++)
