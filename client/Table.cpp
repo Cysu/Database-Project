@@ -49,6 +49,7 @@ void Table::load(const vector<string>& initRows) {
 		for (int j = 0; j < parseRet.size(); j ++) {
 			if (columns[i].type == INT) {
 				columns[i].insertIndex(parseRet[j][i].first, rowOffset + j);
+				//cout << "insert" << endl;
 			} else {
 				columns[i].insertIndex(parseRet[j][i].second, rowOffset + j);
 			}

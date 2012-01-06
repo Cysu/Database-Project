@@ -11,10 +11,19 @@ JoinAgent::JoinAgent(
 }
 
 void JoinAgent::init(const hash_set<int>& filterRet) {
-	for (hash_set<int>::iterator iter = filterRet.begin(); iter != filterRet.end(); iter ++) {
-		int* joinRetItem = new int[n];
-		joinRetItem[0] = *iter;
-		ret.push_back(joinRetItem);
+	if (filterRet.size() == 0) {
+		int num = tables[order[0]].rows->count();
+		for (int i = 0; i < num; i++) {
+			int* joinRetItem = new int[n];
+			joinRetItem[0] = i;
+			ret.push_back(joinRetItem);
+		}
+	} else if (filterRet.find(-1) == filterRet.end()) {
+		for (hash_set<int>::iterator iter = filterRet.begin(); iter != filterRet.end(); iter ++) {
+			int* joinRetItem = new int[n];
+			joinRetItem[0] = *iter;
+			ret.push_back(joinRetItem);
+		}
 	}
 }
 
@@ -54,12 +63,11 @@ void JoinAgent::join(int i, const hash_set<int>& filterRet) {
 				tables[tIdB].columns[cIdB].filterBy(t, matchRows);
 			//	cout << t << endl;
 			}
-
+			delete rowContent;
 		}
 		//cout << "matches " << matchRows.size() << endl;
 		addTo(newRet, j, i, matchRows, filterRet);
 	}
-	delete rowContent;
 
 
 	for (int j = 0; j < ret.size(); j ++)
@@ -87,7 +95,7 @@ void JoinAgent::sort(vector<int*>& ret, int t, int l, int r) {
 	
 void JoinAgent::addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const hash_set<int>& filterRet) {
 	for (int k = 0; k < matchRows.size(); k ++) {
-		if (filterRet.find(matchRows[k]) != filterRet.end()) {
+		if (filterRet.size() == 0 || filterRet.find(matchRows[k]) != filterRet.end()) {
 			int* joinRetItem = new int[n];
 			memcpy(joinRetItem, ret[j], n * 4);
 			joinRetItem[i + 1] = matchRows[k];

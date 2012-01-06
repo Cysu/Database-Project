@@ -144,7 +144,6 @@ void execute(const string& sql)
 		f = filter(tables[tableId[sp.tables[0]]], mttFCond[tableId[sp.tables[0]]]);
 	}
 
-	//cout << s[f].size() << endl;
 
 	ja.init(s[f]);
 	//ja.output(ja.ret);
@@ -399,45 +398,111 @@ void genOutput(int start, int len) {
 }
 
 int filter(Table& t, const set <Cond>& FCond) {
-	bool found = false;
+	//cout << "filter" << endl;
 	s[0].clear();
-	s[1].clear();
 	vector<int> temp;
 	int p = 0;
+	if (FCond.empty()) {
+		//cout << "no filter, size:" << s[0].size() << endl;
+		return 0;
+	}
+	int max;
+	set <Cond>::iterator indexCondi = FCond.begin();
+	// find the best cond
+	if (FCond.begin()->type == RANG)
+		max = 3;
+	else
+		max = t.columns[columnId[FCond.begin()->colName].second].index->count();
 	for (set <Cond>::iterator it = FCond.begin(); it != FCond.end(); it++) {
-		int tid = columnId[it->colName].first;
-		int cid = columnId[it->colName].second;	
-		temp.clear();
-		switch(it->type) {
-			case IFIL:
-				tables[tid].columns[cid].filterBy(it->c_int, EQU, temp);
-				break;
-			case SFIL:
-				tables[tid].columns[cid].filterBy(it->c_string, temp);
-				break;
-			case RANG:
-				switch(it->op) {
-					case '<':
-						tables[tid].columns[cid].filterBy(it->c_int, LES, temp);
-						break;
-					case '>':
-						tables[tid].columns[cid].filterBy(it->c_int, GTR, temp);
-						break;
-				}
-				break;
-		}	
-		s[p^1].clear();
-		for (int i = 0; i < temp.size(); i++) {
-			if (!found || s[p].find(temp[i]) != s[p].end())
-				s[p^1].insert(temp[i]);
+		if (it->type == RANG) {
+			if (3 > max) {
+				max = 3;
+				indexCondi = it;
+			}
+		} else {
+			if (t.columns[columnId[it->colName].second].index->count() > max) {
+				max = t.columns[columnId[it->colName].second].index->count();
+				indexCondi = it;
+			}
 		}
-		found = true;
-		p ^= 1;
 	}
-	if (!found) {
-		for (int i = 0; i < t.rows->count(); i++)
-			s[p].insert(i);
+	//cout << indexCondi->colName << endl;
+	// filter by indexCond
+	int cid = columnId[indexCondi->colName].second;
+	switch(indexCondi->type) {
+		case IFIL:
+			//cout << "IFIL" << endl;
+			t.columns[cid].filterBy(indexCondi->c_int, EQU, temp);
+			break;
+		case SFIL:
+			t.columns[cid].filterBy(indexCondi->c_string, temp);
+			break;
+		case RANG:
+			switch(indexCondi->op) {
+				case '<':
+					t.columns[cid].filterBy(indexCondi->c_int, LES, temp);
+					break;
+				case '>':
+					t.columns[cid].filterBy(indexCondi->c_int, GTR, temp);
+					break;
+			}
+			break;
 	}
-	return p;
+	//cout << "temp size:" << temp.size() << endl;
+	if (temp.size() == 0) {
+		s[0].insert(-1);
+		//cout << "no result size:" << s[0].size() << endl;
+		return 0;
+	}
+	// filter by the remain Cond
+	if (FCond.size() == 1) {
+		for (int i = 0; i < temp.size(); i++)
+			s[0].insert(temp[i]);
+		//cout << "only one filter, set size:" << s[0].size() << endl;
+		return 0;
+	}
+	byte* rowContent = NULL;
+	for (int i = 0; i < temp.size(); i++) {
+		size_t rowLen;
+		byte kBuf[4];
+		getBigNotation(temp[i], kBuf);
+		rowContent = t.rows->get(kBuf, 4, &rowLen);
+		bool match = true;
+		for (set <Cond>::iterator it = FCond.begin(); it != FCond.end(); it++) {
+			if (it == indexCondi)
+				continue;
+			int colOffset = t.columns[columnId[it->colName].second].offset;
+			unsigned int integer;
+			string str;
+			switch (it->type) {
+				case SFIL:
+					str = rowContent + colOffset;
+					if (str != it->c_string)
+						match = false;
+					break;
+				case IFIL:
+					integer = *((unsigned int*)(rowContent + colOffset));
+					if (integer != it->c_int)
+						match = false;
+					break;
+				case RANG:
+					integer = *((unsigned int*)(rowContent + colOffset));
+					if (it->op == '<' && integer >= it->c_int)
+						match = false;
+					if (it->op == '>' && integer <= it->c_int)
+						match = false;
+					break;
+			}
+			if (!match)
+				break;
+		}
+		if (match)
+			s[0].insert(temp[i]);
+		delete rowContent;
+	}
+	//cout << "filter by other filter, set size:" << s[0].size() << endl;
+	if (s[0].size() == 0)
+		s[0].insert(-1);
+	return 0;
 }	
 
