@@ -6,6 +6,7 @@
 #include <cassert>
 #include <iostream>
 #include <utility>
+#include <time.h>
 
 #include "../include/client.h"
 #include "lib_tokenize.h"
@@ -50,12 +51,16 @@ int* joinOrder;
 //internal result
 vector <int*> jaRet;
 
-hash_set<int> s[2];
+set<int> s[2];
 
 void initJoinGraph(SQLParser& sp);
 void genJoinOrder(SQLParser& sp, int* joinOrder);
 void genOutput(int start, int len);
 int resultRowNum, outputRowNum;
+
+double loadTime = 0.0, parseTime = 0.0, genJoinOrderTime = 0.0, filterTime = 0.0, joinTime = 0.0, outputTime = 0.0;
+double insertTime = 0.0, joinInitTime = 0.0, filterIndexTime = 0.0, filterCheckTime = 0.0, filterInitTime = 0.0;
+timespec t1, t2, t3, t4;
 
 
 void create(const string& table_name, const vector<string>& column_name,
@@ -96,7 +101,10 @@ void train(const vector<string>& query, const vector<double>& weight)
 
 void load(const string& table_name, const vector<string>& row)
 {
+	clock_gettime(CLOCK_REALTIME, &t1);
 	tables[tableId[table_name]].load(row);
+	clock_gettime(CLOCK_REALTIME, &t2);
+	loadTime += t2.tv_sec - t1.tv_sec + 1.0 * (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 }
 
 void preprocess()
@@ -110,6 +118,7 @@ void execute(const string& sql)
 	int i;
 	result.clear();
 	//cout << sql << endl;
+	clock_gettime(CLOCK_REALTIME, &t1);
 	if (strstr(sql.c_str(), "INSERT") != NULL) {
 		lib_tokenize(sql.c_str(), token);
 		i += 2;//skip INSERT INTO
@@ -119,23 +128,29 @@ void execute(const string& sql)
 				continue;
 			t.insert(token[i].substr(1, token[i].size() - 2));	
 		}
+		clock_gettime(CLOCK_REALTIME, &t2);
+		insertTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 		return;	
 	}
 
+	clock_gettime(CLOCK_REALTIME, &t1);
 	//SELECT
 	//cout << "querying... " << sql << endl;
 	SQLParser sp(sql);
+	clock_gettime(CLOCK_REALTIME, &t2);
+	parseTime += t2.tv_sec - t1.tv_sec + 1.0 * (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 	//cout << "SQLParser ok" << endl;
 	//cout << "join number:" << sp.join.size() << endl;
 	//cout << "table number:" << sp.tables.size() << endl;
+	clock_gettime(CLOCK_REALTIME, &t1);
 	initJoinGraph(sp);
 	joinOrder = new int[JConds.size()*4];	// delete at the end of next()
 	genJoinOrder(sp, joinOrder);
-
+	clock_gettime(CLOCK_REALTIME, &t2);
+	genJoinOrderTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 	/*for (int i = 0; i < JConds.size(); i ++) {
 		printf("%d %d %d %d\n", joinOrder[i*4], joinOrder[i*4+1], joinOrder[i*4+2], joinOrder[i*4+3]);
 	}*/
-
 	int f;
 	JoinAgent ja(tables, JConds.size() + 1, joinOrder);
 	if (JConds.size() > 0) {
@@ -144,13 +159,18 @@ void execute(const string& sql)
 		f = filter(tables[tableId[sp.tables[0]]], mttFCond[tableId[sp.tables[0]]]);
 	}
 
-
+	clock_gettime(CLOCK_REALTIME, &t1);
 	ja.init(s[f]);
+	clock_gettime(CLOCK_REALTIME, &t2);
+	joinInitTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 	//ja.output(ja.ret);
 	for (int i = 0; i < JConds.size(); i ++) {
 		f = filter(tables[joinOrder[i * 4 + 2]], mttFCond[joinOrder[i * 4 + 2]]);
 	//	cout << "internal Result size:" << ja.ret.size() << " next table size:" << s[f].size() << endl;
+		clock_gettime(CLOCK_REALTIME, &t1);
 		ja.join(i, s[f]);
+		clock_gettime(CLOCK_REALTIME, &t2);
+		joinTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 	}
 	jaRet = ja.ret;	
 	//ja.output(ja.ret);
@@ -187,6 +207,17 @@ int next(char *row)
 
 void close()
 {
+	cout << "loadTime:" << loadTime << endl;
+	cout << "parseTime:" << parseTime << endl;
+	cout << "genJoinOrderTime:" << genJoinOrderTime << endl;
+	cout << "filterTime:" << filterTime << endl;
+	cout << "\tfilterInitTime:" << filterInitTime << endl;
+	cout << "\tfilterIndexTime:" << filterIndexTime << endl;
+	cout << "\tfilterCheckTime:" << filterCheckTime << endl;
+	cout << "joinTime:" << joinTime << endl;
+	cout << "\tjoinInitTime:" << joinInitTime << endl;
+	cout << "insertTime:" << insertTime << endl; 
+	cout << "outputTime:" << outputTime << endl;
 }
 
 void initJoinGraph(SQLParser& sp) {
@@ -303,6 +334,7 @@ void genJoinOrder(SQLParser&sp, int* joinOrder) {
 
 vector <vector <string> > t_result(BLOCK_SIZE);
 void genOutput(int start, int len) {
+	clock_gettime(CLOCK_REALTIME, &t1);
 	byte* rowContent = NULL;
 	int resLen = jaRet.size() - start < len ? jaRet.size() - start : len;
 	result.resize(resLen, string());
@@ -367,6 +399,8 @@ void genOutput(int start, int len) {
 		}
 		result[j] += t_result[j][outputCols.size() - 1];
 	}		
+	clock_gettime(CLOCK_REALTIME, &t2);
+	outputTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 	/*
 	for (int i = 0; i < sp.output.size(); i++) {
 		int tid = columnId[sp.output[i]].first;
@@ -399,11 +433,16 @@ void genOutput(int start, int len) {
 
 int filter(Table& t, const set <Cond>& FCond) {
 	//cout << "filter" << endl;
+	clock_gettime(CLOCK_REALTIME, &t1);
 	s[0].clear();
 	vector<int> temp;
+	clock_gettime(CLOCK_REALTIME, &t3);
+	filterInitTime += t3.tv_sec - t1.tv_sec + (t3.tv_nsec - t1.tv_nsec) / 1000000000.0;
 	int p = 0;
 	if (FCond.empty()) {
 		//cout << "no filter, size:" << s[0].size() << endl;
+		clock_gettime(CLOCK_REALTIME, &t2);
+		filterTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 		return 0;
 	}
 	int max;
@@ -428,6 +467,7 @@ int filter(Table& t, const set <Cond>& FCond) {
 	}
 	//cout << indexCondi->colName << endl;
 	// filter by indexCond
+	clock_gettime(CLOCK_REALTIME, &t3);
 	int cid = columnId[indexCondi->colName].second;
 	switch(indexCondi->type) {
 		case IFIL:
@@ -448,17 +488,24 @@ int filter(Table& t, const set <Cond>& FCond) {
 			}
 			break;
 	}
+	clock_gettime(CLOCK_REALTIME, &t4);
+	filterIndexTime += t4.tv_sec - t3.tv_sec + (t4.tv_nsec - t3.tv_nsec) / 1000000000.0;
 	//cout << "temp size:" << temp.size() << endl;
 	if (temp.size() == 0) {
 		s[0].insert(-1);
 		//cout << "no result size:" << s[0].size() << endl;
+		clock_gettime(CLOCK_REALTIME, &t2);
+		filterTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 		return 0;
 	}
+	clock_gettime(CLOCK_REALTIME, &t3);
 	// filter by the remain Cond
 	if (FCond.size() == 1) {
 		for (int i = 0; i < temp.size(); i++)
 			s[0].insert(temp[i]);
 		//cout << "only one filter, set size:" << s[0].size() << endl;
+		clock_gettime(CLOCK_REALTIME, &t2);
+		filterTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 		return 0;
 	}
 	byte* rowContent = NULL;
@@ -500,9 +547,13 @@ int filter(Table& t, const set <Cond>& FCond) {
 			s[0].insert(temp[i]);
 		delete rowContent;
 	}
+	clock_gettime(CLOCK_REALTIME, &t4);
+	filterCheckTime += t4.tv_sec - t3.tv_sec + (t4.tv_nsec - t3.tv_nsec) / 1000000000.0;
 	//cout << "filter by other filter, set size:" << s[0].size() << endl;
 	if (s[0].size() == 0)
 		s[0].insert(-1);
+	clock_gettime(CLOCK_REALTIME, &t2);
+	filterTime += t2.tv_sec - t1.tv_sec + (t2.tv_nsec - t1.tv_nsec) / 1000000000.0;
 	return 0;
 }	
 

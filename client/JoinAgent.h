@@ -26,14 +26,14 @@ public:
 		int* order
 	);
 
-	void init(const hash_set<int>& filterRet);
-	void join(int i, const hash_set<int>& filterRet);
+	void init(const set<int>& filterRet);
+	void join(int i, const set<int>& filterRet);
 
 	void output(const vector<int*>& ret);
 
 	static void sort(vector<int*>& ret, int t, int l, int r);
 private:
-	void addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const hash_set<int>& filterRet);
+	void addTo(vector<int*>& newRet, int j, int i, const vector<int>& matchRows, const set<int>& filterRet);
 };
 
 #endif // JOINAGENT_H
