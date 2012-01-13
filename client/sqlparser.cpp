@@ -36,7 +36,7 @@ SQLParser::SQLParser(const string& sql) {
 			i++;
 			Cond c;
 			if (token[i][0] == '\'' ||
-			    (token[i][0] > '0' && 
+			    (token[i][0] >= '0' && 
 			    token[i][0] <= '9')) {
 				c.colName = colx;
 				if (token[i][0] == '\'') {

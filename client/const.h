@@ -15,7 +15,8 @@ enum OPR_TYPE {
 typedef char byte;
 
 const int COLUMN_MAX_LENGTH = 520;
-const int ROW_MAX_LENGTH = 10000;
+const int MAX_INT = 2147483647;
+const int MAX_TABLES = 1000;
 const int BLOCK_SIZE = 16384; //the size of the return vector 
 
 #endif // CONST_H

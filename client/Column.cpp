@@ -3,97 +3,80 @@
 Column::Column(const string& name, const string& type) {
 	this->name = name;
 	if (type[0] == 'I') {
-		len = 4;	// 1 int = 4 bytes
+		len = 4;
 		this->type = INT;
 	} else {
 		sscanf(type.c_str(), "VARCHAR(%d)", &len);
-		len += 3;		// for '\0' and '\'*2'
+		len += 3;
 		this->type = STRING;
 	}
-	index = NULL;
 	needIndex = false;
-	hasIndex = false;
-}
-
-void Column::initIndex() {
-	index = new TreeDB();
-	index->open(("data/" + name + ".kct").c_str(), TreeDB::OWRITER | TreeDB::OTRUNCATE | TreeDB:: OCREATE);
-	hasIndex = true;
+	diffKey = 0;
+	minKey = 2147483647;
+	maxKey = 0;
 }
 
 void Column::insertIndex(unsigned int key, int rowNum) {
-	byte kBuf[4];
-	getBigNotation(key, kBuf);
-	const byte* vBuf = (byte*) &rowNum;
-	index->append(kBuf, 4, vBuf, 4);
-	//printf("insertIndex: %s, %u, %d\n", name.c_str(), key, rowNum);
+	if (intIndex.find(key) == intIndex.end())
+		diffKey ++;
+	minKey = minKey > key ? key : minKey;
+	maxKey = maxKey < key ? key : maxKey;
+	intIndex.insert(make_pair(key, rowNum));
 }
 
 void Column::insertIndex(string key, int rowNum) {
-	const byte* kBuf = key.c_str();
-	const byte* vBuf = (byte*) &rowNum;
-	index->append(kBuf, key.length(), vBuf, 4);
-	//printf("insertIndex: %s, %s, %d\n", name.c_str(), key.c_str(), rowNum);
+	if (strIndex.find(key) == strIndex.end())
+		diffKey ++;
+	strIndex.insert(make_pair(key, rowNum));
 }
 
 void Column::filterBy(unsigned int key, OPR_TYPE opr, vector<int>& ret) {
-	DB::Cursor* cur = index->cursor();
-	size_t size;
-	byte* vBuf = NULL;
-	byte kBuf[4];
-	bool exist;
+	pair<multimap<unsigned int, int>::iterator, multimap<unsigned int, int>::iterator> range;
+	multimap<unsigned int, int>::iterator low, up;
 	switch (opr) {
 		case EQU:
-			getBigNotation(key, kBuf);
-			vBuf = index->get(kBuf, 4, &size);
-			if (vBuf != NULL) {
-				for (int i = 0; i < size; i += 4) {
-					int t = *((int*)(vBuf + i));
-					ret.push_back(t);
-				}
+			range = intIndex.equal_range(key);
+			for (multimap<unsigned int, int>::iterator it = range.first;
+					it != range.second; it ++) {
+				ret.push_back(it->second);
 			}
 			break;
 		case LES:
-			// assert key != INT_MIN
-			getBigNotation(key - 1, kBuf);
-			exist = cur->jump_back(kBuf, 4);
-			while (exist) {
-				vBuf = cur->get_value(&size, false);
-				for (int i = 0; i < size; i += 4) {
-					int t = *((int*)(vBuf + i));
-					ret.push_back(t);
-				}
-				exist = cur->step_back();
-			}
+			low = intIndex.lower_bound(0);
+			up = intIndex.upper_bound(key - 1);
+			for (multimap<unsigned int, int>::iterator it = low; it != up; it ++)
+				ret.push_back(it->second);
 			break;
 		case GTR:
-			// assert key != INT_MAX
-			getBigNotation(key + 1, kBuf);
-			exist = cur->jump(kBuf, 4);
-			while (exist) {
-				vBuf = cur->get_value(&size, false);
-				for (int i = 0; i < size; i += 4) {
-					int t = *((int*)(vBuf + i));
-					ret.push_back(t);
-				}
-				exist = cur->step();
-			}
+			low = intIndex.lower_bound(key + 1);
+			up = intIndex.upper_bound(2147483647);
+			for (multimap<unsigned int, int>::iterator it = low; it != up; it ++)
+				ret.push_back(it->second);
+			break;
+		default:
 			break;
 	}
-	delete vBuf;
-	delete cur;
 }
 
 void Column::filterBy(string key, vector<int>& ret) {
-	size_t size;
-	byte* vBuf = index->get(key.c_str(), key.length(), &size);
-	for (int i = 0; i < size; i += 4) {
-		int t = *((int*)(vBuf + i));
-		ret.push_back(t);
+	pair<multimap<string, int>::iterator, multimap<string, int>::iterator> range;
+	range = strIndex.equal_range(key);
+	for (multimap<string, int>::iterator it = range.first;
+			it != range.second; it ++) {
+		ret.push_back(it->second);
 	}
-	delete vBuf;
 }
-	
-		
 
+int Column::getIndexCount(OPR_TYPE type, unsigned int key) {
+	if (type == EQU)
+		return intIndex.size() / diffKey;
+	else if (type == LES)
+		return (key - minKey) * 1.0 / (maxKey - minKey) * intIndex.size();
+	else if (type == GTR)
+		return (maxKey - key) * 1.0 / (maxKey - minKey) * intIndex.size();
+}
+
+int Column::getIndexCount(string key) {
+	return strIndex.size() / diffKey;
+}
 

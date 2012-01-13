@@ -1,30 +1,38 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#include <string>
-#include <vector>
-#include <cstring>
+#include <set>
 #include "Column.h"
+#include "cond.h"
+#include "kchashdb.h"
 
-using namespace std;
+using namespace kyotocabinet;
 
 class Table {
 public:
 	string name;
 	vector<Column> columns;
+	map<string, int> columnId;
 	HashDB* rows;
-	vector<int> primary;
+	int rowLen;
 
 	Table(const string& name, const vector<string>& columnName,
 			const vector<string>& columnType, const vector<string>& primaryKey);
 
+	int getColumnId(string columnName);
+
 	void load(const vector<string>& initRows);
-	void insert(const string& row);
+	void insert(const string& insertRow);
+
+	unsigned int getIntValue(int r, int c);
+	string getStringValue(int r, int c);
+
+	void getByConds(vector<Cond>& conds, set<int>& ret);
+
+	int condHeuristic(const Cond& cond);
 
 private:
-	int rowLen;	// length of each row(in bytes)
-	byte* parse(const string& s, vector<vector<pair<int, string> > >& parseRet);
+	byte* parse(const string& s, vector<pair<int, string> >& parseRet);
 };
-
 
 #endif // TABLE_H
